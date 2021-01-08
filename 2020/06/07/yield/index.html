@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>yield</title><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><meta http-equiv="X-UA-Compatible" content="IE=Edge，chrome=1"><meta name="description" content=""><meta name="keywords"><meta name="author" content="心安"><link rel="short icon" href="/images/favicon.png"><link rel="icon" href="/images/favicon.png"><!--[if lt IE 9]>
+<script src="/js/modernizr.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="/css/iconfont.css">
+
+<link rel="stylesheet" href="/css/index.css?v=202101081315.css">
+<link rel="stylesheet" href="/css/info.css?v=202101081315.css">
+<link href="https://cdn.bootcss.com/highlight.js/9.15.9/styles/github.min.css" rel="stylesheet"><meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="Feel Easy" type="application/atom+xml">
+</head><body><header id="header" class="header-navigation"><nav><div class="logo"><a href="https://feel-easy.github.io">Feel Easy</a></div><h2 id="mnavh"><span class="navicon"></span></h2><ul id="starlist"><li><a href="/">首页</a></li><li><a href="/time">时间轴</a></li></ul><div class="searchbox"><div id="search_bar" class="search_bar"><input id="keyboard" placeholder="想搜点什么呢.." type="text" name="keyboard" autocomplete="off" class="input"><p class="search_ico"><span></span></p></div></div></nav></header><article><main><div class="con_warp"><div class="infosbox"><div class="newsview"><h3 class="news_title">yield</h3><div class="bloginfo"><ul><li class="author">作者：<a href="/">心安</a></li><li class="lmname"><a href="/">笔记</a></li><li class="timer">时间：2020-06-07 10:49:22</li><li class="view"><span id="busuanzi_value_page_pv">99</span><span>次访问</span></li></ul></div><div class="tags"><a href="/tags/ruby/" target="_blank">ruby</a></div><div class="news_con"><h2 id="yield"><a href="#yield" class="headerlink" title="yield"></a>yield</h2><p>所有的”方法（methods）”隐式跟上一个”块（block）”参数。</p>
+<p>块参数也可以明确给定，形式就是在参数前面加一个”&amp;”，比如 def fn(arg1, arg2, &amp;block) end，其中的 &amp;block 就是明确给定的块参数。</p>
+<p>块参数的动作，可以通过调用 call() 方法执行，还可以用 yield 来执行 —— yield 其实就是一个语法糖。</p>
+<p>所以以下几种写法常常是等价的：</p>
+<pre><code class="ruby">#method receives an invisible block argument
+def foo
+    yield 1
+end
+
+#specify it explicitly
+def foo2(&amp;block)
+    yield 1
+end
+
+#yield is equal to block.call
+def foo3(&amp;block)
+    block.call(1)    
+end
+
+#function call
+foo1 &#123;|x| puts x&#125;    # =&gt; 1
+foo2 &#123;|x| puts x&#125;    # =&gt; 1
+foo3 &#123;|x| puts x&#125;    # =&gt; 1</code></pre>
+<h2 id="Proc"><a href="#Proc" class="headerlink" title="Proc"></a>Proc</h2><p>前面说到所有方法都可以隐式或显式指定一个块参数，那么块参数到底是什么呢？</p>
+<p>答案是 Proc 对象，一个具有 call 方法的对象。</p>
+<p>Proc 对象的定义有几种形式：</p>
+<ul>
+<li>直接使用 {}</li>
+<li>使用 Proc.new {}</li>
+<li>使用 proc {}</li>
+<li>使用 lambda {}</li>
+</ul>
+<pre><code class="ruby">#yield is equal to block.call
+def foo(&amp;block)
+    puts block.class
+    puts block.to_s
+    yield 1    
+end
+
+#function call
+# Proc created using &#123;&#125; syntax
+foo &#123;|x| puts x&#125;   
+# =&gt; Proc
+# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):9&gt;
+# =&gt; 1
+
+# Proc created with the &quot;proc&quot; keyword. Note &amp; syntax when calling.
+my_proc = proc &#123; |n| puts n &#125;
+foo(&amp;my_proc)
+# =&gt; Proc
+# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):12&gt;
+# =&gt; 1
+
+# Proc creates with Proc.new
+my_proc = Proc.new &#123; |n| puts n &#125;
+foo(&amp;my_proc)    # =&gt; 1
+# =&gt; Proc
+# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):16&gt;
+# =&gt; 1
+
+# Proc created with the &quot;lambda&quot; keyword. Nearly same thing.
+my_proc = lambda &#123; |n| puts n &#125;
+foo(&amp;my_proc)
+# =&gt; Proc
+# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):20 (lambda)&gt;
+# =&gt; 1</code></pre>
+<h2 id="yield-self"><a href="#yield-self" class="headerlink" title="yield self"></a>yield self</h2><p>在一个对象中，self 表示是一个当前对象的引用。</p>
+<p>所以，常见的 yield self if block_given? 中的 self 就和其它地方使用 self 一样，没什么特殊的。</p>
+<pre><code class="ruby">class C1
+    def foo(&amp;block)
+        puts block.class
+        puts block.to_s
+        yield self if block_given?
+        yield &quot;AAAAAAAAA&quot;
+    end
+end
+
+class C2
+    def foo(&amp;block)
+        puts block.class
+        puts block.to_s
+        yield self if block_given?
+        yield &quot;BBBBBBBBB&quot;
+    end
+
+    def to_s
+        &quot;XXXXXXXXXX&quot;
+    end
+end
+
+c1 = C1.new
+c1.foo  &#123;|x| puts x&#125;
+# =&gt; Proc
+# =&gt; #&lt;Proc:0x00000001c84aa0@(ruby):23&gt;
+# =&gt; #&lt;Context::C1:0x00000001c84af0&gt;
+# =&gt; AAAAAAAAA
+
+c2 = C2.new
+c2.foo  &#123;|x| puts x&#125;
+# =&gt; Proc
+# =&gt; #&lt;Proc:0x00000001c842f8@(ruby):26&gt;
+# =&gt; XXXXXXXXXX
+# =&gt; BBBBBBBBB</code></pre>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>method 定义中 &amp;block 参数必须在最后</p>
+<pre><code class="ruby"># 正确示例
+def foo(arg1, arg2, &amp;block)
+    puts block
+end
+
+#function call
+block = proc &#123;|x| puts x&#125;
+foo( 1, 2, &amp;block)                   
+# =&gt; #&lt;Proc:0x000000011f3aa0@(ruby):14&gt;
+
+#错误示例
+def foo(arg1, &amp;block, arg2)     # =&gt; (ruby): syntax error
+    puts block
+end</code></pre>
+<p>yield 相当于是 block.call() 方法的调用，所以参数个数也需要对应</p>
+<pre><code class="ruby">def foo()
+    yield 1,2,3     # 这里的 1 2 3 就是传递的参数
+end
+
+#function call
+foo &#123;|x| puts x&#125;        # =&gt; 1
+foo &#123;|x,y,z| puts z&#125;    # =&gt; 3
+foo &#123;|x,y,z,k| puts k&#125;  # 为空</code></pre>
+</div></div><div class="nextinfo"><p>上一篇：<a href="/2021/01/07/new-blog/">Hexo 使用简介</a></p><p>下一篇：没有了</p></div><div class="news_pl"><div id="comment_container"></div></div></div></div></main><aside class="r_box"><div class="card box"><h2>我的名片</h2><div class="box_con"><p>网名: 心安</p>
+<p>技术栈：ruby vue python </p>
+<p>Email：l.wang@rccchina.com</p>
+</div></div><div class="category box"><h2>文章分类</h2><div class="box_con"><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a><span class="category-list-count">2</span></li></ul></div></div><div class="wechat box"><h2>我的微信</h2><div class="box_con"><img src="/images/wechat.png"></div></div></aside></article><footer><section class="footer_bottom"><div class="footer_container"><p class="copyright">Design by
+<a href='https://feel-easy.github.io/' target='_blank'>Feel Easy</a>
+</p><ul class="social_network"></ul></div></section></footer><div class="cd-top"><i class="iconfont icon-top"></i></div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/scrollreveal.js"></script>
+<script src="/js/hc-sticky.js"></script>
+<script src="/js/canvas-nest.js" type="text/javascript" color="47,135,193" opacity="0.7" zIndex="-2" count="199"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/highlight.min.js"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/languages/java.min.js"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/languages/javascript.min.js"></script><script type="text/javascript">hljs.initHighlightingOnLoad();</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="/js/common.js?v=202101081315.js"></script>
+<script src="/js/index.js?v=202101081315.js"></script>
+</body></html>
