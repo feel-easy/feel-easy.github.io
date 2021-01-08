@@ -6,7 +6,7 @@
   <link href="https://feel-easy.github.io/atom.xml" rel="self"/>
   
   <link href="https://feel-easy.github.io/"/>
-  <updated>2021-01-08T05:53:52.723Z</updated>
+  <updated>2021-01-08T06:08:27.037Z</updated>
   <id>https://feel-easy.github.io/</id>
   
   <author>
@@ -17,19 +17,77 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>yield</title>
+    <title>python虚拟环境virtualenv</title>
+    <link href="https://feel-easy.github.io/2021/01/08/pythonvirtualenv/"/>
+    <id>https://feel-easy.github.io/2021/01/08/pythonvirtualenv/</id>
+    <published>2021-01-08T07:30:22.000Z</published>
+    <updated>2021-01-08T06:08:27.037Z</updated>
+    
+    <content type="html"><![CDATA[<p>pip, virtualenv, fabric通称为pythoner的三大神器。</p><p>virtualenv——用来建立一个虚拟的python环境，一个专属于项目的python环境。用virtualenv 来保持一个干净的环境非常有用</p><p>测试环境：linux下</p><h3 id="1、基本使用"><a href="#1、基本使用" class="headerlink" title="1、基本使用"></a>1、基本使用</h3><p>  通过pip安装virtualenv：</p><pre><code class="shell">pip install virtualenv</code></pre><p>  测试安装:</p><pre><code class="shell">virtualenv --version</code></pre><p>  为一个工程项目搭建一个虚拟环境:</p><pre><code class="shell">cd my_projectvirtualenv my_project_env</code></pre><p>  另外，如果存在多个python解释器，可以选择指定一个Python解释器（比如<code>python2.7</code>），没有指定则由系统默认的解释器来搭建： </p><pre><code class="shell">virtualenv -p /usr/bin/python2.7 my_project_env</code></pre><p>  将会在当前的目录中创建一个名my_project_env的文件夹，这是一个独立的python运行环境，包含了Python可执行文件， 以及 <code>pip</code> 库的一份拷贝，这样就能安装其他包了，不过已经安装到系统Python环境中的所有第三方包都不会复制过来，这样，我们就得到了一个不带任何第三方包的“干净”的Python运行环境来。</p><p> 要开始使用虚拟环境，其需要被激活：</p><pre><code class="shell">source my_project_env/bin/activate</code></pre><p>停用虚拟环境：</p><pre><code class="shell">deactivate</code></pre><p>停用后将回到系统默认的Python解释器</p><h3 id="2、其他"><a href="#2、其他" class="headerlink" title="2、其他"></a>2、其他</h3><p>用pip freeze查看当前安装版本</p><pre><code class="shell">pip freeze</code></pre><p>另外：</p><pre><code class="shell">pip freeze &gt; requirements.txt</code></pre><p>这将会创建一个 <code>requirements.txt</code> 文件，其中包含了当前环境中所有包及 各自的版本的简单列表。您可以使用 “pip list”在不产生requirements文件的情况下， 查看已安装包的列表。这将会使另一个不同的开发者（或者是您，如果您需要重新创建这样的环境） 在以后安装相同版本的相同包变得容易。</p><pre><code class="shell">pip install -r requirements.txt</code></pre><p>  这能帮助确保安装、部署和开发者之间的一致性。</p><h2 id="virtualenvwrapper"><a href="#virtualenvwrapper" class="headerlink" title="virtualenvwrapper"></a>virtualenvwrapper</h2><p>提供了一系列命令使得和虚拟环境工作变得愉快许多。它把您所有的虚拟环境都放在一个地方。</p><ol><li>将您的所有虚拟环境在一个地方。</li><li>包装用于管理虚拟环境（创建，删除，复制）。</li><li>使用一个命令来环境之间进行切换。</li></ol><h3 id="1、安装"><a href="#1、安装" class="headerlink" title="1、安装"></a>1、安装</h3><p>  安装（确保 <strong>virtualenv</strong> 已经安装了）：</p><pre><code class="shell">pip install virtualenvwrapperexport WORKON_HOME=~/Envs  #设置环境变量mkdir -p $WORKON_HOME #创建虚拟环境管理目录find / -name virtualenvwrapper.sh #找到virtualenvwrapper.sh的路径source 路径 #激活virtualenvwrapper.sh</code></pre><p>默认virtualenvwrapper安装在下面python解释器中的site-packages，实际上需要运行virtualenvwrapper.sh文件才行；所以需要先进行配置一下：</p><ul><li><code>找到virtualenvwrapper.sh的路径：find / -name virtualenvwrapper.sh</code></li><li>运行virtualenvwrapper.sh文件：source 路径</li></ul><pre><code class="shell">export WORKON_HOME=~/.virtualenvsexport VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3source /home/l/.local/bin/virtualenvwrapper.sh</code></pre><p><strong>ps：每次要想使用virtualenvwrapper 工具时，都必须先激活virtualenvwrapper.sh,另外，如果创建前要将即将的环境保存到Envs中，就要先设置一下环境变量：</strong>export WORKON_HOME=~/Envs，再搭建</p><p>对于Windows，您可以使用 virtualenvwrapper-win</p><p>  安装（确保 <strong>virtualenv</strong> 已经安装了）：</p><pre><code class="shell">pip install virtualenvwrapper-win在Windows中，WORKON_HOME默认的路径是 %USERPROFILE%Envs 。</code></pre><h3 id="2、基本使用"><a href="#2、基本使用" class="headerlink" title="2、基本使用"></a>2、基本使用</h3><p>1、创建一个虚拟环境：</p><pre><code class="shell">mkvirtualenv project_env</code></pre><p><code>这会在Envs</code> 中创建 project_env虚拟环境</p><p>　  选择一个python解释器来搭建：</p><pre><code class="shell">mkvirtualenv env  --python=python2.7</code></pre><p>2、在虚拟环境上工作：</p><pre><code class="shell"> workon project_env</code></pre><p>或者，您可以创建一个项目，它会创建虚拟环境，并在 <code>$WORKON_HOME</code> 中创建一个项目目录。 当您使用 <code>workon </code>project_env 时，会 <code>cd</code> -ed 到项目目录中。</p><pre><code class="shell">mkvirtualenv project_env</code></pre><p><strong>virtualenvwrapper</strong> 提供环境名字的tab补全功能。当您有很多环境， 并且很难记住它们的名字时，这就显得很有用。</p><p><code>workon</code> 也能停止您当前所在的环境，所以您可以在环境之间快速的切换。</p><p>3、停止虚拟环境</p><pre><code class="shell">deactivate</code></pre><p>4、删除：</p><pre><code class="shell"> rmvirtualenv project_env</code></pre><h3 id="3、其他有用的命令"><a href="#3、其他有用的命令" class="headerlink" title="3、其他有用的命令"></a>3、其他有用的命令</h3><pre><code class="shell">lsvirtualenv    #列举所有的环境。cdvirtualenv    #导航到当前激活的虚拟环境的目录中，比如说这样您就能够浏览它的 site-packages。cdsitepackages   # 和上面的类似，但是是直接进入到 site-packages 目录中。lssitepackages     #显示 site-packages 目录中的内容。</code></pre><p><a href="https://virtualenvwrapper.readthedocs.io/en/latest/command_ref.html">virtualenvwrapper 命令的完全列表</a> 。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;pip, virtualenv, fabric通称为pythoner的三大神器。&lt;/p&gt;
+&lt;p&gt;virtualenv——用来建立一个虚拟的python环境，一个专属于项目的python环境。用virtualenv 来保持一个干净的环境非常有用&lt;/p&gt;
+&lt;p&gt;测试环境：lin</summary>
+      
+    
+    
+    
+    <category term="笔记" scheme="https://feel-easy.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
+    
+    
+    <category term="python" scheme="https://feel-easy.github.io/tags/python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>FactoryBot 使用总结</title>
+    <link href="https://feel-easy.github.io/2021/01/08/FactoryBot%20%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/"/>
+    <id>https://feel-easy.github.io/2021/01/08/FactoryBot%20%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/</id>
+    <published>2021-01-08T06:55:31.000Z</published>
+    <updated>2021-01-08T06:08:35.829Z</updated>
+    
+    <content type="html"><![CDATA[<p>1、四种创建方法</p><pre><code class="ruby"># 返回对象 但是不保存user = build(:user)# 返回对象并且保存user = create(:user)# 返回可用于构建用户实例的属性 HASHattrs = attributes_for(:user)# 返回一个对象，该对象的所有定义属性都已存根stub = build_stubbed(:user)# 将一个块传递给上面的任何方法都将产生返回对象create(:user) do |user|  user.posts.create(attributes_for(:post))end</code></pre><p>2、覆盖属性</p><pre><code class="ruby"># Build a User instance and override the first_name propertyuser = build(:user, first_name: &quot;Joe&quot;)user.first_name# =&gt; &quot;Joe&quot;</code></pre><p>3、重命名</p><pre><code class="ruby">factory :user, aliases: [:author, :commenter] do  first_name &#123; &quot;John&quot; &#125;  last_name &#123; &quot;Doe&quot; &#125;  date_of_birth &#123; 18.years.ago &#125;endfactory :post do  author  # instead of  # association :author, factory: :user  title &#123; &quot;How to read a book effectively&quot; &#125;  body &#123; &quot;There are five steps involved.&quot; &#125;endfactory :comment do  commenter  # instead of  # association :commenter, factory: :user  body &#123; &quot;Great article!&quot; &#125;end</code></pre><p>4、属性依赖</p><pre><code class="ruby">factory :user do  first_name &#123; &quot;Joe&quot; &#125;  last_name  &#123; &quot;Blow&quot; &#125;  email &#123; &quot;#&#123;first_name&#125;.#&#123;last_name&#125;@example.com&quot;.downcase &#125;endcreate(:user, last_name: &quot;Doe&quot;).email# =&gt; &quot;joe.doe@example.com&quot;</code></pre><p>5、通过嵌套工厂，您可以轻松地为同一个类创建多个工厂，而无需重复常见的属性:</p><pre><code class="ruby">factory :post do  title &#123; &quot;A title&quot; &#125;  factory :approved_post do    approved &#123; true &#125;  endendapproved_post = create(:approved_post)approved_post.title    # =&gt; &quot;A title&quot;approved_post.approved # =&gt; true</code></pre><pre><code class="ruby">factory :post do  title &#123; &quot;A title&quot; &#125;endfactory :approved_post, parent: :post do  approved &#123; true &#125;end</code></pre><p>6、在factory_bot 5中，关联默认使用与其父对象相同的构建策略:</p><pre><code class="ruby">FactoryBot.define do  factory :author  factory :post do    author  endendpost = build(:post)post.new_record?        # =&gt; truepost.author.new_record? # =&gt; truepost = create(:post)post.new_record?        # =&gt; falsepost.author.new_record? # =&gt; false</code></pre>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;1、四种创建方法&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;# 返回对象 但是不保存
+user = build(:user)
+
+# 返回对象并且保存
+user = create(:user)
+
+# 返回可用于构建用户实例的属性 HASH
+attrs = att</summary>
+      
+    
+    
+    
+    <category term="笔记" scheme="https://feel-easy.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
+    
+    
+    <category term="ruby" scheme="https://feel-easy.github.io/tags/ruby/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>yield 的基本使用</title>
     <link href="https://feel-easy.github.io/2021/01/08/yield/"/>
     <id>https://feel-easy.github.io/2021/01/08/yield/</id>
     <published>2021-01-08T06:49:22.000Z</published>
-    <updated>2021-01-08T05:53:52.723Z</updated>
+    <updated>2021-01-08T06:01:19.198Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="yield"><a href="#yield" class="headerlink" title="yield"></a>yield</h2><p>所有的”方法（methods）”隐式跟上一个”块（block）”参数。</p><p>块参数也可以明确给定，形式就是在参数前面加一个”&amp;”，比如 def fn(arg1, arg2, &amp;block) end，其中的 &amp;block 就是明确给定的块参数。</p><p>块参数的动作，可以通过调用 call() 方法执行，还可以用 yield 来执行 —— yield 其实就是一个语法糖。</p><p>所以以下几种写法常常是等价的：</p><pre><code class="ruby">#method receives an invisible block argumentdef foo    yield 1end#specify it explicitlydef foo2(&amp;block)    yield 1end#yield is equal to block.calldef foo3(&amp;block)    block.call(1)    end#function callfoo1 &#123;|x| puts x&#125;    # =&gt; 1foo2 &#123;|x| puts x&#125;    # =&gt; 1foo3 &#123;|x| puts x&#125;    # =&gt; 1</code></pre><h2 id="Proc"><a href="#Proc" class="headerlink" title="Proc"></a>Proc</h2><p>前面说到所有方法都可以隐式或显式指定一个块参数，那么块参数到底是什么呢？</p><p>答案是 Proc 对象，一个具有 call 方法的对象。</p><p>Proc 对象的定义有几种形式：</p><ul><li>直接使用 {}</li><li>使用 Proc.new {}</li><li>使用 proc {}</li><li>使用 lambda {}</li></ul><pre><code class="ruby">#yield is equal to block.calldef foo(&amp;block)    puts block.class    puts block.to_s    yield 1    end#function call# Proc created using &#123;&#125; syntaxfoo &#123;|x| puts x&#125;   # =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):9&gt;# =&gt; 1# Proc created with the &quot;proc&quot; keyword. Note &amp; syntax when calling.my_proc = proc &#123; |n| puts n &#125;foo(&amp;my_proc)# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):12&gt;# =&gt; 1# Proc creates with Proc.newmy_proc = Proc.new &#123; |n| puts n &#125;foo(&amp;my_proc)    # =&gt; 1# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):16&gt;# =&gt; 1# Proc created with the &quot;lambda&quot; keyword. Nearly same thing.my_proc = lambda &#123; |n| puts n &#125;foo(&amp;my_proc)# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):20 (lambda)&gt;# =&gt; 1</code></pre><h2 id="yield-self"><a href="#yield-self" class="headerlink" title="yield self"></a>yield self</h2><p>在一个对象中，self 表示是一个当前对象的引用。</p><p>所以，常见的 yield self if block_given? 中的 self 就和其它地方使用 self 一样，没什么特殊的。</p><pre><code class="ruby">class C1    def foo(&amp;block)        puts block.class        puts block.to_s        yield self if block_given?        yield &quot;AAAAAAAAA&quot;    endendclass C2    def foo(&amp;block)        puts block.class        puts block.to_s        yield self if block_given?        yield &quot;BBBBBBBBB&quot;    end    def to_s        &quot;XXXXXXXXXX&quot;    endendc1 = C1.newc1.foo  &#123;|x| puts x&#125;# =&gt; Proc# =&gt; #&lt;Proc:0x00000001c84aa0@(ruby):23&gt;# =&gt; #&lt;Context::C1:0x00000001c84af0&gt;# =&gt; AAAAAAAAAc2 = C2.newc2.foo  &#123;|x| puts x&#125;# =&gt; Proc# =&gt; #&lt;Proc:0x00000001c842f8@(ruby):26&gt;# =&gt; XXXXXXXXXX# =&gt; BBBBBBBBB</code></pre><h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>method 定义中 &amp;block 参数必须在最后</p><pre><code class="ruby"># 正确示例def foo(arg1, arg2, &amp;block)    puts blockend#function callblock = proc &#123;|x| puts x&#125;foo( 1, 2, &amp;block)                   # =&gt; #&lt;Proc:0x000000011f3aa0@(ruby):14&gt;#错误示例def foo(arg1, &amp;block, arg2)     # =&gt; (ruby): syntax error    puts blockend</code></pre><p>yield 相当于是 block.call() 方法的调用，所以参数个数也需要对应</p><pre><code class="ruby">def foo()    yield 1,2,3     # 这里的 1 2 3 就是传递的参数end#function callfoo &#123;|x| puts x&#125;        # =&gt; 1foo &#123;|x,y,z| puts z&#125;    # =&gt; 3foo &#123;|x,y,z,k| puts k&#125;  # 为空</code></pre>]]></content>
+    <content type="html"><![CDATA[<p>所有的”方法（methods）”隐式跟上一个”块（block）”参数。</p><p>块参数也可以明确给定，形式就是在参数前面加一个”&amp;”，比如 def fn(arg1, arg2, &amp;block) end，其中的 &amp;block 就是明确给定的块参数。</p><p>块参数的动作，可以通过调用 call() 方法执行，还可以用 yield 来执行 —— yield 其实就是一个语法糖。</p><p>所以以下几种写法常常是等价的：</p><pre><code class="ruby">#method receives an invisible block argumentdef foo    yield 1end#specify it explicitlydef foo2(&amp;block)    yield 1end#yield is equal to block.calldef foo3(&amp;block)    block.call(1)    end#function callfoo1 &#123;|x| puts x&#125;    # =&gt; 1foo2 &#123;|x| puts x&#125;    # =&gt; 1foo3 &#123;|x| puts x&#125;    # =&gt; 1</code></pre><h2 id="Proc"><a href="#Proc" class="headerlink" title="Proc"></a>Proc</h2><p>前面说到所有方法都可以隐式或显式指定一个块参数，那么块参数到底是什么呢？</p><p>答案是 Proc 对象，一个具有 call 方法的对象。</p><p>Proc 对象的定义有几种形式：</p><ul><li>直接使用 {}</li><li>使用 Proc.new {}</li><li>使用 proc {}</li><li>使用 lambda {}</li></ul><pre><code class="ruby">#yield is equal to block.calldef foo(&amp;block)    puts block.class    puts block.to_s    yield 1    end#function call# Proc created using &#123;&#125; syntaxfoo &#123;|x| puts x&#125;   # =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):9&gt;# =&gt; 1# Proc created with the &quot;proc&quot; keyword. Note &amp; syntax when calling.my_proc = proc &#123; |n| puts n &#125;foo(&amp;my_proc)# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):12&gt;# =&gt; 1# Proc creates with Proc.newmy_proc = Proc.new &#123; |n| puts n &#125;foo(&amp;my_proc)    # =&gt; 1# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):16&gt;# =&gt; 1# Proc created with the &quot;lambda&quot; keyword. Nearly same thing.my_proc = lambda &#123; |n| puts n &#125;foo(&amp;my_proc)# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):20 (lambda)&gt;# =&gt; 1</code></pre><h2 id="yield-self"><a href="#yield-self" class="headerlink" title="yield self"></a>yield self</h2><p>在一个对象中，self 表示是一个当前对象的引用。</p><p>所以，常见的 yield self if block_given? 中的 self 就和其它地方使用 self 一样，没什么特殊的。</p><pre><code class="ruby">class C1    def foo(&amp;block)        puts block.class        puts block.to_s        yield self if block_given?        yield &quot;AAAAAAAAA&quot;    endendclass C2    def foo(&amp;block)        puts block.class        puts block.to_s        yield self if block_given?        yield &quot;BBBBBBBBB&quot;    end    def to_s        &quot;XXXXXXXXXX&quot;    endendc1 = C1.newc1.foo  &#123;|x| puts x&#125;# =&gt; Proc# =&gt; #&lt;Proc:0x00000001c84aa0@(ruby):23&gt;# =&gt; #&lt;Context::C1:0x00000001c84af0&gt;# =&gt; AAAAAAAAAc2 = C2.newc2.foo  &#123;|x| puts x&#125;# =&gt; Proc# =&gt; #&lt;Proc:0x00000001c842f8@(ruby):26&gt;# =&gt; XXXXXXXXXX# =&gt; BBBBBBBBB</code></pre><h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>method 定义中 &amp;block 参数必须在最后</p><pre><code class="ruby"># 正确示例def foo(arg1, arg2, &amp;block)    puts blockend#function callblock = proc &#123;|x| puts x&#125;foo( 1, 2, &amp;block)                   # =&gt; #&lt;Proc:0x000000011f3aa0@(ruby):14&gt;#错误示例def foo(arg1, &amp;block, arg2)     # =&gt; (ruby): syntax error    puts blockend</code></pre><p>yield 相当于是 block.call() 方法的调用，所以参数个数也需要对应</p><pre><code class="ruby">def foo()    yield 1,2,3     # 这里的 1 2 3 就是传递的参数end#function callfoo &#123;|x| puts x&#125;        # =&gt; 1foo &#123;|x,y,z| puts z&#125;    # =&gt; 3foo &#123;|x,y,z,k| puts k&#125;  # 为空</code></pre>]]></content>
     
     
       
       
-    <summary type="html">&lt;h2 id=&quot;yield&quot;&gt;&lt;a href=&quot;#yield&quot; class=&quot;headerlink&quot; title=&quot;yield&quot;&gt;&lt;/a&gt;yield&lt;/h2&gt;&lt;p&gt;所有的”方法（methods）”隐式跟上一个”块（block）”参数。&lt;/p&gt;
-&lt;p&gt;块参数也可以明确给定，形式就是</summary>
+    <summary type="html">&lt;p&gt;所有的”方法（methods）”隐式跟上一个”块（block）”参数。&lt;/p&gt;
+&lt;p&gt;块参数也可以明确给定，形式就是在参数前面加一个”&amp;amp;”，比如 def fn(arg1, arg2, &amp;amp;block) end，其中的 &amp;amp;block 就是明确给定的块参数</summary>
       
     
     
@@ -46,7 +104,7 @@
     <link href="https://feel-easy.github.io/2021/01/07/new-blog/"/>
     <id>https://feel-easy.github.io/2021/01/07/new-blog/</id>
     <published>2021-01-07T02:49:22.000Z</published>
-    <updated>2021-01-08T03:02:34.835Z</updated>
+    <updated>2021-01-08T06:08:10.888Z</updated>
     
     <content type="html"><![CDATA[<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。<br>大大降低了建站的成本。</p><h3 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h3><pre><code class="bash">hexo new &quot;My New Post&quot;</code></pre><h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><pre><code class="bash">hexo serverhexo s</code></pre><h3 id="生成静态文件"><a href="#生成静态文件" class="headerlink" title="生成静态文件"></a>生成静态文件</h3><pre><code class="bash">hexo generatehexo g</code></pre><h3 id="发布"><a href="#发布" class="headerlink" title="发布"></a>发布</h3><pre><code class="bash">hexo deployhexo d</code></pre><p><a href="https://hexo.io/">Hexo官网</a><br><a href="https://hexo.io/docs/">Hexo 官方文档</a><br><a href="https://hexo.io/zh-cn/docs/troubleshooting.html">问题解答</a><br><a href="https://github.com/hexojs/hexo/issues">GitHub</a></p>]]></content>
     

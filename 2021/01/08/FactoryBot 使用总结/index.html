@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>FactoryBot 使用总结</title><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><meta http-equiv="X-UA-Compatible" content="IE=Edge，chrome=1"><meta name="description" content=""><meta name="keywords"><meta name="author" content="心安"><link rel="short icon" href="/images/favicon.png"><link rel="icon" href="/images/favicon.png"><!--[if lt IE 9]>
+<script src="/js/modernizr.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="/css/iconfont.css">
+
+<link rel="stylesheet" href="/css/index.css?v=202101081409.css">
+<link rel="stylesheet" href="/css/info.css?v=202101081409.css">
+<link href="https://cdn.bootcss.com/highlight.js/9.15.9/styles/github.min.css" rel="stylesheet"><meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="Feel Easy" type="application/atom+xml">
+</head><body><header id="header" class="header-navigation"><nav><div class="logo"><a href="https://feel-easy.github.io">Feel Easy</a></div><h2 id="mnavh"><span class="navicon"></span></h2><ul id="starlist"><li><a href="/">首页</a></li><li><a href="/time">时间轴</a></li></ul><div class="searchbox"><div id="search_bar" class="search_bar"><input id="keyboard" placeholder="想搜点什么呢.." type="text" name="keyboard" autocomplete="off" class="input"><p class="search_ico"><span></span></p></div></div></nav></header><article><main><div class="con_warp"><div class="infosbox"><div class="newsview"><h3 class="news_title">FactoryBot 使用总结</h3><div class="bloginfo"><ul><li class="author">作者：<a href="/">心安</a></li><li class="lmname"><a href="/">笔记</a></li><li class="timer">时间：2021-01-08 14:55:31</li><li class="view"><span id="busuanzi_value_page_pv">99</span><span>次访问</span></li></ul></div><div class="tags"><a href="/tags/ruby/" target="_blank">ruby</a></div><div class="news_con"><p>1、四种创建方法</p>
+<pre><code class="ruby"># 返回对象 但是不保存
+user = build(:user)
+
+# 返回对象并且保存
+user = create(:user)
+
+# 返回可用于构建用户实例的属性 HASH
+attrs = attributes_for(:user)
+
+# 返回一个对象，该对象的所有定义属性都已存根
+stub = build_stubbed(:user)
+
+# 将一个块传递给上面的任何方法都将产生返回对象
+create(:user) do |user|
+  user.posts.create(attributes_for(:post))
+end</code></pre>
+<p>2、覆盖属性</p>
+<pre><code class="ruby"># Build a User instance and override the first_name property
+user = build(:user, first_name: &quot;Joe&quot;)
+user.first_name
+# =&gt; &quot;Joe&quot;</code></pre>
+<p>3、重命名</p>
+<pre><code class="ruby">factory :user, aliases: [:author, :commenter] do
+  first_name &#123; &quot;John&quot; &#125;
+  last_name &#123; &quot;Doe&quot; &#125;
+  date_of_birth &#123; 18.years.ago &#125;
+end
+
+factory :post do
+  author
+  # instead of
+  # association :author, factory: :user
+  title &#123; &quot;How to read a book effectively&quot; &#125;
+  body &#123; &quot;There are five steps involved.&quot; &#125;
+end
+
+factory :comment do
+  commenter
+  # instead of
+  # association :commenter, factory: :user
+  body &#123; &quot;Great article!&quot; &#125;
+end</code></pre>
+<p>4、属性依赖</p>
+<pre><code class="ruby">factory :user do
+  first_name &#123; &quot;Joe&quot; &#125;
+  last_name  &#123; &quot;Blow&quot; &#125;
+  email &#123; &quot;#&#123;first_name&#125;.#&#123;last_name&#125;@example.com&quot;.downcase &#125;
+end
+
+create(:user, last_name: &quot;Doe&quot;).email
+# =&gt; &quot;joe.doe@example.com&quot;</code></pre>
+<p>5、通过嵌套工厂，您可以轻松地为同一个类创建多个工厂，而无需重复常见的属性:</p>
+<pre><code class="ruby">factory :post do
+  title &#123; &quot;A title&quot; &#125;
+
+  factory :approved_post do
+    approved &#123; true &#125;
+  end
+end
+
+approved_post = create(:approved_post)
+approved_post.title    # =&gt; &quot;A title&quot;
+approved_post.approved # =&gt; true</code></pre>
+<pre><code class="ruby">factory :post do
+  title &#123; &quot;A title&quot; &#125;
+end
+
+factory :approved_post, parent: :post do
+  approved &#123; true &#125;
+end</code></pre>
+<p>6、在factory_bot 5中，关联默认使用与其父对象相同的构建策略:</p>
+<pre><code class="ruby">FactoryBot.define do
+  factory :author
+
+  factory :post do
+    author
+  end
+end
+
+post = build(:post)
+post.new_record?        # =&gt; true
+post.author.new_record? # =&gt; true
+
+post = create(:post)
+post.new_record?        # =&gt; false
+post.author.new_record? # =&gt; false</code></pre>
+</div></div><div class="nextinfo"><p>上一篇：<a href="/2021/01/08/pythonvirtualenv/">python虚拟环境virtualenv</a></p><p>下一篇：<a href="/2021/01/08/yield/">yield 的基本使用</a></p></div><div class="news_pl"><div id="comment_container"></div></div></div></div></main><aside class="r_box"><div class="card box"><h2>我的名片</h2><div class="box_con"><p>网名: 心安</p>
+<p>技术栈：ruby vue python </p>
+<p>Email：l.wang@rccchina.com</p>
+</div></div><div class="category box"><h2>文章分类</h2><div class="box_con"><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a><span class="category-list-count">4</span></li></ul></div></div><div class="wechat box"><h2>我的微信</h2><div class="box_con"><img src="/images/wechat.png"></div></div></aside></article><footer><section class="footer_bottom"><div class="footer_container"><p class="copyright">Design by
+<a href='https://feel-easy.github.io/' target='_blank'>Feel Easy</a>
+</p><ul class="social_network"></ul></div></section></footer><div class="cd-top"><i class="iconfont icon-top"></i></div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/scrollreveal.js"></script>
+<script src="/js/hc-sticky.js"></script>
+<script src="/js/canvas-nest.js" type="text/javascript" color="47,135,193" opacity="0.7" zIndex="-2" count="199"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/highlight.min.js"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/languages/java.min.js"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/languages/javascript.min.js"></script><script type="text/javascript">hljs.initHighlightingOnLoad();</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="/js/common.js?v=202101081409.js"></script>
+<script src="/js/index.js?v=202101081409.js"></script>
+</body></html>
