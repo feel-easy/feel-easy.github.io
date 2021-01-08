@@ -6,7 +6,7 @@
   <link href="https://feel-easy.github.io/atom.xml" rel="self"/>
   
   <link href="https://feel-easy.github.io/"/>
-  <updated>2021-01-08T03:02:34.835Z</updated>
+  <updated>2021-01-08T05:53:52.723Z</updated>
   <id>https://feel-easy.github.io/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>yield</title>
+    <link href="https://feel-easy.github.io/2021/01/08/yield/"/>
+    <id>https://feel-easy.github.io/2021/01/08/yield/</id>
+    <published>2021-01-08T06:49:22.000Z</published>
+    <updated>2021-01-08T05:53:52.723Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="yield"><a href="#yield" class="headerlink" title="yield"></a>yield</h2><p>所有的”方法（methods）”隐式跟上一个”块（block）”参数。</p><p>块参数也可以明确给定，形式就是在参数前面加一个”&amp;”，比如 def fn(arg1, arg2, &amp;block) end，其中的 &amp;block 就是明确给定的块参数。</p><p>块参数的动作，可以通过调用 call() 方法执行，还可以用 yield 来执行 —— yield 其实就是一个语法糖。</p><p>所以以下几种写法常常是等价的：</p><pre><code class="ruby">#method receives an invisible block argumentdef foo    yield 1end#specify it explicitlydef foo2(&amp;block)    yield 1end#yield is equal to block.calldef foo3(&amp;block)    block.call(1)    end#function callfoo1 &#123;|x| puts x&#125;    # =&gt; 1foo2 &#123;|x| puts x&#125;    # =&gt; 1foo3 &#123;|x| puts x&#125;    # =&gt; 1</code></pre><h2 id="Proc"><a href="#Proc" class="headerlink" title="Proc"></a>Proc</h2><p>前面说到所有方法都可以隐式或显式指定一个块参数，那么块参数到底是什么呢？</p><p>答案是 Proc 对象，一个具有 call 方法的对象。</p><p>Proc 对象的定义有几种形式：</p><ul><li>直接使用 {}</li><li>使用 Proc.new {}</li><li>使用 proc {}</li><li>使用 lambda {}</li></ul><pre><code class="ruby">#yield is equal to block.calldef foo(&amp;block)    puts block.class    puts block.to_s    yield 1    end#function call# Proc created using &#123;&#125; syntaxfoo &#123;|x| puts x&#125;   # =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):9&gt;# =&gt; 1# Proc created with the &quot;proc&quot; keyword. Note &amp; syntax when calling.my_proc = proc &#123; |n| puts n &#125;foo(&amp;my_proc)# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):12&gt;# =&gt; 1# Proc creates with Proc.newmy_proc = Proc.new &#123; |n| puts n &#125;foo(&amp;my_proc)    # =&gt; 1# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):16&gt;# =&gt; 1# Proc created with the &quot;lambda&quot; keyword. Nearly same thing.my_proc = lambda &#123; |n| puts n &#125;foo(&amp;my_proc)# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):20 (lambda)&gt;# =&gt; 1</code></pre><h2 id="yield-self"><a href="#yield-self" class="headerlink" title="yield self"></a>yield self</h2><p>在一个对象中，self 表示是一个当前对象的引用。</p><p>所以，常见的 yield self if block_given? 中的 self 就和其它地方使用 self 一样，没什么特殊的。</p><pre><code class="ruby">class C1    def foo(&amp;block)        puts block.class        puts block.to_s        yield self if block_given?        yield &quot;AAAAAAAAA&quot;    endendclass C2    def foo(&amp;block)        puts block.class        puts block.to_s        yield self if block_given?        yield &quot;BBBBBBBBB&quot;    end    def to_s        &quot;XXXXXXXXXX&quot;    endendc1 = C1.newc1.foo  &#123;|x| puts x&#125;# =&gt; Proc# =&gt; #&lt;Proc:0x00000001c84aa0@(ruby):23&gt;# =&gt; #&lt;Context::C1:0x00000001c84af0&gt;# =&gt; AAAAAAAAAc2 = C2.newc2.foo  &#123;|x| puts x&#125;# =&gt; Proc# =&gt; #&lt;Proc:0x00000001c842f8@(ruby):26&gt;# =&gt; XXXXXXXXXX# =&gt; BBBBBBBBB</code></pre><h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>method 定义中 &amp;block 参数必须在最后</p><pre><code class="ruby"># 正确示例def foo(arg1, arg2, &amp;block)    puts blockend#function callblock = proc &#123;|x| puts x&#125;foo( 1, 2, &amp;block)                   # =&gt; #&lt;Proc:0x000000011f3aa0@(ruby):14&gt;#错误示例def foo(arg1, &amp;block, arg2)     # =&gt; (ruby): syntax error    puts blockend</code></pre><p>yield 相当于是 block.call() 方法的调用，所以参数个数也需要对应</p><pre><code class="ruby">def foo()    yield 1,2,3     # 这里的 1 2 3 就是传递的参数end#function callfoo &#123;|x| puts x&#125;        # =&gt; 1foo &#123;|x,y,z| puts z&#125;    # =&gt; 3foo &#123;|x,y,z,k| puts k&#125;  # 为空</code></pre>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;yield&quot;&gt;&lt;a href=&quot;#yield&quot; class=&quot;headerlink&quot; title=&quot;yield&quot;&gt;&lt;/a&gt;yield&lt;/h2&gt;&lt;p&gt;所有的”方法（methods）”隐式跟上一个”块（block）”参数。&lt;/p&gt;
+&lt;p&gt;块参数也可以明确给定，形式就是</summary>
+      
+    
+    
+    
+    <category term="笔记" scheme="https://feel-easy.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
+    
+    
+    <category term="ruby" scheme="https://feel-easy.github.io/tags/ruby/"/>
+    
+  </entry>
   
   <entry>
     <title>Hexo 使用简介</title>
@@ -38,31 +63,6 @@
     
     
     <category term="教程" scheme="https://feel-easy.github.io/tags/%E6%95%99%E7%A8%8B/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>yield</title>
-    <link href="https://feel-easy.github.io/2020/06/07/yield/"/>
-    <id>https://feel-easy.github.io/2020/06/07/yield/</id>
-    <published>2020-06-07T02:49:22.000Z</published>
-    <updated>2021-01-08T05:12:03.119Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="yield"><a href="#yield" class="headerlink" title="yield"></a>yield</h2><p>所有的”方法（methods）”隐式跟上一个”块（block）”参数。</p><p>块参数也可以明确给定，形式就是在参数前面加一个”&amp;”，比如 def fn(arg1, arg2, &amp;block) end，其中的 &amp;block 就是明确给定的块参数。</p><p>块参数的动作，可以通过调用 call() 方法执行，还可以用 yield 来执行 —— yield 其实就是一个语法糖。</p><p>所以以下几种写法常常是等价的：</p><pre><code class="ruby">#method receives an invisible block argumentdef foo    yield 1end#specify it explicitlydef foo2(&amp;block)    yield 1end#yield is equal to block.calldef foo3(&amp;block)    block.call(1)    end#function callfoo1 &#123;|x| puts x&#125;    # =&gt; 1foo2 &#123;|x| puts x&#125;    # =&gt; 1foo3 &#123;|x| puts x&#125;    # =&gt; 1</code></pre><h2 id="Proc"><a href="#Proc" class="headerlink" title="Proc"></a>Proc</h2><p>前面说到所有方法都可以隐式或显式指定一个块参数，那么块参数到底是什么呢？</p><p>答案是 Proc 对象，一个具有 call 方法的对象。</p><p>Proc 对象的定义有几种形式：</p><ul><li>直接使用 {}</li><li>使用 Proc.new {}</li><li>使用 proc {}</li><li>使用 lambda {}</li></ul><pre><code class="ruby">#yield is equal to block.calldef foo(&amp;block)    puts block.class    puts block.to_s    yield 1    end#function call# Proc created using &#123;&#125; syntaxfoo &#123;|x| puts x&#125;   # =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):9&gt;# =&gt; 1# Proc created with the &quot;proc&quot; keyword. Note &amp; syntax when calling.my_proc = proc &#123; |n| puts n &#125;foo(&amp;my_proc)# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):12&gt;# =&gt; 1# Proc creates with Proc.newmy_proc = Proc.new &#123; |n| puts n &#125;foo(&amp;my_proc)    # =&gt; 1# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):16&gt;# =&gt; 1# Proc created with the &quot;lambda&quot; keyword. Nearly same thing.my_proc = lambda &#123; |n| puts n &#125;foo(&amp;my_proc)# =&gt; Proc# =&gt; #&lt;Proc:0x00000000e0b140@(ruby):20 (lambda)&gt;# =&gt; 1</code></pre><h2 id="yield-self"><a href="#yield-self" class="headerlink" title="yield self"></a>yield self</h2><p>在一个对象中，self 表示是一个当前对象的引用。</p><p>所以，常见的 yield self if block_given? 中的 self 就和其它地方使用 self 一样，没什么特殊的。</p><pre><code class="ruby">class C1    def foo(&amp;block)        puts block.class        puts block.to_s        yield self if block_given?        yield &quot;AAAAAAAAA&quot;    endendclass C2    def foo(&amp;block)        puts block.class        puts block.to_s        yield self if block_given?        yield &quot;BBBBBBBBB&quot;    end    def to_s        &quot;XXXXXXXXXX&quot;    endendc1 = C1.newc1.foo  &#123;|x| puts x&#125;# =&gt; Proc# =&gt; #&lt;Proc:0x00000001c84aa0@(ruby):23&gt;# =&gt; #&lt;Context::C1:0x00000001c84af0&gt;# =&gt; AAAAAAAAAc2 = C2.newc2.foo  &#123;|x| puts x&#125;# =&gt; Proc# =&gt; #&lt;Proc:0x00000001c842f8@(ruby):26&gt;# =&gt; XXXXXXXXXX# =&gt; BBBBBBBBB</code></pre><h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>method 定义中 &amp;block 参数必须在最后</p><pre><code class="ruby"># 正确示例def foo(arg1, arg2, &amp;block)    puts blockend#function callblock = proc &#123;|x| puts x&#125;foo( 1, 2, &amp;block)                   # =&gt; #&lt;Proc:0x000000011f3aa0@(ruby):14&gt;#错误示例def foo(arg1, &amp;block, arg2)     # =&gt; (ruby): syntax error    puts blockend</code></pre><p>yield 相当于是 block.call() 方法的调用，所以参数个数也需要对应</p><pre><code class="ruby">def foo()    yield 1,2,3     # 这里的 1 2 3 就是传递的参数end#function callfoo &#123;|x| puts x&#125;        # =&gt; 1foo &#123;|x,y,z| puts z&#125;    # =&gt; 3foo &#123;|x,y,z,k| puts k&#125;  # 为空</code></pre>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h2 id=&quot;yield&quot;&gt;&lt;a href=&quot;#yield&quot; class=&quot;headerlink&quot; title=&quot;yield&quot;&gt;&lt;/a&gt;yield&lt;/h2&gt;&lt;p&gt;所有的”方法（methods）”隐式跟上一个”块（block）”参数。&lt;/p&gt;
-&lt;p&gt;块参数也可以明确给定，形式就是</summary>
-      
-    
-    
-    
-    <category term="笔记" scheme="https://feel-easy.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
-    
-    
-    <category term="ruby" scheme="https://feel-easy.github.io/tags/ruby/"/>
     
   </entry>
   
