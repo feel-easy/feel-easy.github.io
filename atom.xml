@@ -6,7 +6,7 @@
   <link href="https://feel-easy.github.io/atom.xml" rel="self"/>
   
   <link href="https://feel-easy.github.io/"/>
-  <updated>2021-01-08T06:08:27.037Z</updated>
+  <updated>2021-01-28T07:51:49.933Z</updated>
   <id>https://feel-easy.github.io/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>乱码数据的处理问题</title>
+    <link href="https://feel-easy.github.io/2021/01/28/%E4%B9%B1%E7%A0%81%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86%E9%97%AE%E9%A2%98/"/>
+    <id>https://feel-easy.github.io/2021/01/28/%E4%B9%B1%E7%A0%81%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86%E9%97%AE%E9%A2%98/</id>
+    <published>2021-01-28T06:21:39.000Z</published>
+    <updated>2021-01-28T07:51:49.933Z</updated>
+    
+    <content type="html"><![CDATA[<p>作为一个开发人员，遇见中文乱码问题是常有的事情， 但是 想要复原这些乱码数据的一致是一个让人头疼的问题<br>这里我总结了几个 可以判断乱码原始编码的几个方法<br><strong>比如 拿到一个乱码数据:</strong></p><pre><code class="python">temp = &#39;楀钩镞惰鐪熷涔狅纴鍒昏嫤阍荤爷鎶?湳锛屾墡瀹炲伐浣滐纴瑙勮寖绠＄悊銆备汉镐寲镄勭鐞嗗哜镵氢简涓?镓规妧链骞诧纴寰楀埌浜嗗叏鍏徃锻桦伐镄勪俊璧栥?锻桦伐100%鍙傚姞鍖讳缭锛?5钖嶅憳宸弬锷犲煄淇濓纴澶栨潵锻桦伐鎻愪緵椋熷锛屾椂镞跺埢鍒讳互鍏变骇鍏氩憳镄勬爣鍑呜 閲忚嚜宸憋纴鍦濂戒紒涓氱殑钖屾椂锛屼负绀句细浜嬩笟鎹愯祫锷10涓囧厓锛屾崘璧犺传锲板憳宸灞炴不鐥?涓囧厓锛屽府锷传锲板鐢?.6涓囧厓锛屾崘璧犳枃鏋椾腑瀛绅链鸿澶?涓囧厓锛屾厛锽勬崘鐚?涓囧厓銆?/p&gt; 锻拰鍏村悓蹇楀浜嬩笟镓宪杩芥眰锛屽湪杩椤崄鍑犲勾浼佷笟鍙戝睍杩囩涓纴鍏呭垎鍙戞尌浜嗕竴涓叡浜厷锻樼殑鍏堥攱妯寖甯浣灭敤锛屽弹鍒颁简闀囨敛搴溿?甯傜骇涓荤閮桊镄勮褰帮纴绀句细钖勭晫镄勪竴镊村璇勶纴浠栧潥淇彧链変笉鏂彂灞曪&#39;</code></pre><p>首先要判断字符串的原始编码,python 中的 chardet 可以判断文件的编码，当然如果文本被重新编码过了就不能够判断原来的编码了</p><pre><code class="python">import chardetdata = open(&#39;文件&#39;, &#39;rb&#39;)dicts = chardet.detect(data) dicts # &#123;&#39;encoding&#39;: &#39;utf-8&#39;, &#39;confidence&#39;: 0.99, &#39;language&#39;: &#39;&#39;&#125;</code></pre><p>不过根据经验来说，由于微软对于国内的操作系统使用的是gbk 编码的，可以尝试用gbk编码再使用utf-8再解码, 不过已经再编码过的文本，即便这么操作也很难完全恢复原来的文本</p><pre><code class="python">temp.encode(&#39;gbk&#39;).decode(&#39;utf-8&#39;,&#39;ignore&#39;)                                                                                                                                                               # &#39;平߶真习刻苦Իү?，扎实工作规范管理〱䌖Є理K?ع技干得到了全兏뷥Є信赖?뷥100%参加医?5薍员巏ɠ城保外来뷥提供食，时߶刻刻以共产벑Є标 量自己好企业的薌时，为社ϸ事业捐资10万元，捐赠贫ư员属治?万元，帮ɴư?.6万元，捐赠文林中?万元，慈B捐?万元?/p&gt; ͒兴同志事业追求，在額几年企业发展过充分发挥了一丅亅͘的先锋樌，嵯到镇府?市级主Є彰社ϸ薄界Є一评他坚俏不斏展&#39;</code></pre><p>当然也可以尝试 gb2312，gb18030，big5 等等多种编码再解码</p><p>ruby也有相应的方法</p><pre><code class="ruby">require &#39;iconv&#39;Iconv.iconv(&quot;gbk//IGNORE&quot;,&quot;UTF-8//IGNORE&quot;,temp)</code></pre>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;作为一个开发人员，遇见中文乱码问题是常有的事情， 但是 想要复原这些乱码数据的一致是一个让人头疼的问题&lt;br&gt;这里我总结了几个 可以判断乱码原始编码的几个方法&lt;br&gt;&lt;strong&gt;比如 拿到一个乱码数据:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;py</summary>
+      
+    
+    
+    
+    <category term="问题" scheme="https://feel-easy.github.io/categories/%E9%97%AE%E9%A2%98/"/>
+    
+    
+    <category term="ruby" scheme="https://feel-easy.github.io/tags/ruby/"/>
+    
+    <category term="python" scheme="https://feel-easy.github.io/tags/python/"/>
+    
+  </entry>
   
   <entry>
     <title>python虚拟环境virtualenv</title>
