@@ -6,7 +6,7 @@
   <link href="https://feel-easy.github.io/atom.xml" rel="self"/>
   
   <link href="https://feel-easy.github.io/"/>
-  <updated>2021-01-28T07:51:49.933Z</updated>
+  <updated>2021-02-26T01:00:01.905Z</updated>
   <id>https://feel-easy.github.io/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>redis 常用命令</title>
+    <link href="https://feel-easy.github.io/2021/02/26/redis-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/"/>
+    <id>https://feel-easy.github.io/2021/02/26/redis-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</id>
+    <published>2021-02-26T00:59:34.000Z</published>
+    <updated>2021-02-26T01:00:01.905Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="redis-常用命令"><a href="#redis-常用命令" class="headerlink" title="redis 常用命令"></a>redis 常用命令</h1><p>###1.redis命令</p><pre><code>1 redis执行了make install后，redis的课执行文件都会自动复制到 /usr/local/bin 目录2 redis-server        redis服务器3 redis-cli            redis命令行客户端4 redis-benchmark        redis性能测试工具5 redis-check-aof        aof文件修复工具6 redis-check-dump    rdb文件检查工具</code></pre><h3 id="2-停止Redis命令"><a href="#2-停止Redis命令" class="headerlink" title="2.停止Redis命令"></a>2.停止Redis命令</h3><pre><code># 停止Redis命令redis-cli shutdown</code></pre><h2 id="3-启动-redis-命令"><a href="#3-启动-redis-命令" class="headerlink" title="3.启动 redis 命令"></a>3.启动 redis 命令</h2><h3 id="1-启动-redis-server"><a href="#1-启动-redis-server" class="headerlink" title="(1). # 启动 redis-server"></a>(1). # 启动 redis-server</h3><pre><code>1 redis-server</code></pre><h3 id="2-带配置文件启动"><a href="#2-带配置文件启动" class="headerlink" title="(2). # 带配置文件启动"></a>(2). # 带配置文件启动</h3><pre><code># 注意配置文件路径redis-server ./redis.conf </code></pre><h3 id="3-带配置文件启动-且指定某几个配置-配置名称前加-–"><a href="#3-带配置文件启动-且指定某几个配置-配置名称前加-–" class="headerlink" title="(3). # 带配置文件启动 且指定某几个配置 配置名称前加 –"></a>(3). # 带配置文件启动 且指定某几个配置 配置名称前加 –</h3><pre><code># 配置后台启动，且端口是 1123redis-server ./redis.conf --daemonize yes --port 1123</code></pre><p> 会覆盖配置文件里面的值</p><h2 id="4-redis命令行客户端"><a href="#4-redis命令行客户端" class="headerlink" title="4.redis命令行客户端"></a>4.redis命令行客户端</h2><h3 id="1-发送命令"><a href="#1-发送命令" class="headerlink" title="(1).发送命令"></a>(1).发送命令</h3><pre><code>1 第一种方式2 发送命令，如 redis-cli shutdown3 第二种方式：主要用这种模式4 进入交互模式，默认是127.0.0.1和6379端口5 可以指定 redis-cli -h 127.0.0.1 -p 6379</code></pre><p>注意：框里面的是 6379 里面没有登录成功，下面改成了 1123 成功了，因为刚才上面改了端口</p><h3 id="2-命令返回值"><a href="#2-命令返回值" class="headerlink" title="(2).命令返回值"></a>(2).命令返回值</h3><p>状态回复：pong表示可用</p><p>错误回复：不知道这个什么命令</p><p>整数回复：多种命令会回复整数</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;redis-常用命令&quot;&gt;&lt;a href=&quot;#redis-常用命令&quot; class=&quot;headerlink&quot; title=&quot;redis 常用命令&quot;&gt;&lt;/a&gt;redis 常用命令&lt;/h1&gt;&lt;p&gt;###1.redis命令&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;1 redis执行了</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>乱码数据的处理问题</title>
