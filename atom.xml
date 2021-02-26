@@ -6,7 +6,7 @@
   <link href="https://feel-easy.github.io/atom.xml" rel="self"/>
   
   <link href="https://feel-easy.github.io/"/>
-  <updated>2021-02-26T01:01:52.117Z</updated>
+  <updated>2021-02-26T02:59:31.224Z</updated>
   <id>https://feel-easy.github.io/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>golang 链接redis</title>
+    <link href="https://feel-easy.github.io/2021/02/26/golang-%E9%93%BE%E6%8E%A5redis/"/>
+    <id>https://feel-easy.github.io/2021/02/26/golang-%E9%93%BE%E6%8E%A5redis/</id>
+    <published>2021-02-26T02:58:50.000Z</published>
+    <updated>2021-02-26T02:59:31.224Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="golang-链接redis"><a href="#golang-链接redis" class="headerlink" title="golang 链接redis"></a>golang 链接redis</h1><h2 id="Redis使用"><a href="#Redis使用" class="headerlink" title="Redis使用"></a>Redis使用</h2><p>使用第三方开源的redis库: github.com/garyburd/redigo/redis</p><p>命令行输入 ：</p><pre><code class="shell">go get github.com/garyburd/redigo/redis</code></pre><h2 id="链接Redis"><a href="#链接Redis" class="headerlink" title="链接Redis"></a>链接Redis</h2><pre><code>package mainimport (    &quot;fmt&quot;    &quot;github.com/garyburd/redigo/redis&quot;)func main() &#123;    c, err := redis.Dial(&quot;tcp&quot;, &quot;localhost:6379&quot;)    if err != nil &#123;        fmt.Println(&quot;conn redis failed,&quot;, err)        return    &#125;     fmt.Println(&quot;redis conn success&quot;)    defer c.Close()&#125;</code></pre><h2 id="String类型Set、Get操作"><a href="#String类型Set、Get操作" class="headerlink" title="String类型Set、Get操作"></a>String类型Set、Get操作</h2><pre><code class="go">package mainimport (    &quot;fmt&quot;    &quot;github.com/garyburd/redigo/redis&quot;)func main() &#123;    c, err := redis.Dial(&quot;tcp&quot;, &quot;localhost:6379&quot;)    if err != nil &#123;        fmt.Println(&quot;conn redis failed,&quot;, err)        return    &#125;    defer c.Close()    _, err = c.Do(&quot;Set&quot;, &quot;abc&quot;, 100)    if err != nil &#123;        fmt.Println(err)        return    &#125;    r, err := redis.Int(c.Do(&quot;Get&quot;, &quot;abc&quot;))    if err != nil &#123;        fmt.Println(&quot;get abc failed,&quot;, err)        return    &#125;    fmt.Println(r)&#125;</code></pre><p>运行结果：</p><pre><code>    MISCONF Redis is configured to save RDB snapshots, but is currently not able to persist on disk. Commands that may modify the data set are disabled. Please check Redis logs for details about the error.</code></pre><p>Redis被配置为保存数据库快照，但它目前不能持久化到硬盘。用来修改集合数据的命令不能用。请查看Redis日志的详细错误信息。</p><p>原因：</p><p>强制关闭Redis快照导致不能持久化。</p><p>解决方案：</p><p>运行config set stop-writes-on-bgsave-error no　命令后，关闭配置项stop-writes-on-bgsave-error解决该问题。</p><p>开启命令行新窗口 2：</p><p>链接Redis：</p><pre><code>    redis-cli -h 127.0.0.1 -p 6379    127.0.0.1:6379&gt; config set stop-writes-on-bgsave-error no    OK</code></pre><p>返回命令行窗口 1 运行程序：</p><pre><code>    go run main.go </code></pre><p>输出结果：</p><pre><code>    100</code></pre><p>命令行窗口 2：</p><pre><code>    127.0.0.1:6379&gt; get abc    &quot;100&quot;</code></pre>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;golang-链接redis&quot;&gt;&lt;a href=&quot;#golang-链接redis&quot; class=&quot;headerlink&quot; title=&quot;golang 链接redis&quot;&gt;&lt;/a&gt;golang 链接redis&lt;/h1&gt;&lt;h2 id=&quot;Redis使用&quot;&gt;&lt;a href=</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>redis 常用命令</title>
