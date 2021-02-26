@@ -3,22 +3,21 @@
 <![endif]-->
 <link rel="stylesheet" href="/css/iconfont.css">
 
-<link rel="stylesheet" href="/css/index.css?v=202102260900.css">
-<link rel="stylesheet" href="/css/info.css?v=202102260900.css">
+<link rel="stylesheet" href="/css/index.css?v=202102260902.css">
+<link rel="stylesheet" href="/css/info.css?v=202102260902.css">
 <link href="https://cdn.bootcss.com/highlight.js/9.15.9/styles/github.min.css" rel="stylesheet"><meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="Feel Easy" type="application/atom+xml">
-</head><body><header id="header" class="header-navigation"><nav><div class="logo"><a href="https://feel-easy.github.io">Feel Easy</a></div><h2 id="mnavh"><span class="navicon"></span></h2><ul id="starlist"><li><a href="/">首页</a></li><li><a href="/time">时间轴</a></li></ul><div class="searchbox"><div id="search_bar" class="search_bar"><input id="keyboard" placeholder="想搜点什么呢.." type="text" name="keyboard" autocomplete="off" class="input"><p class="search_ico"><span></span></p></div></div></nav></header><article><main><div class="con_warp"><div class="infosbox"><div class="newsview"><h3 class="news_title">redis 常用命令</h3><div class="bloginfo"><ul><li class="author">作者：<a href="/">心安</a></li><li class="lmname"><a href="/"></a></li><li class="timer">时间：2021-02-26 08:59:34</li><li class="view"><span id="busuanzi_value_page_pv">99</span><span>次访问</span></li></ul></div><div class="tags"></div><div class="news_con"><h1 id="redis-常用命令"><a href="#redis-常用命令" class="headerlink" title="redis 常用命令"></a>redis 常用命令</h1><p>###1.redis命令</p>
-<pre><code>1 redis执行了make install后，redis的课执行文件都会自动复制到 /usr/local/bin 目录
+</head><body><header id="header" class="header-navigation"><nav><div class="logo"><a href="https://feel-easy.github.io">Feel Easy</a></div><h2 id="mnavh"><span class="navicon"></span></h2><ul id="starlist"><li><a href="/">首页</a></li><li><a href="/time">时间轴</a></li></ul><div class="searchbox"><div id="search_bar" class="search_bar"><input id="keyboard" placeholder="想搜点什么呢.." type="text" name="keyboard" autocomplete="off" class="input"><p class="search_ico"><span></span></p></div></div></nav></header><article><main><div class="con_warp"><div class="infosbox"><div class="newsview"><h3 class="news_title">redis 常用命令</h3><div class="bloginfo"><ul><li class="author">作者：<a href="/">心安</a></li><li class="lmname"><a href="/"></a></li><li class="timer">时间：2021-02-26 08:59:34</li><li class="view"><span id="busuanzi_value_page_pv">99</span><span>次访问</span></li></ul></div><div class="tags"></div><div class="news_con"><h1 id="redis-常用命令"><a href="#redis-常用命令" class="headerlink" title="redis 常用命令"></a>redis 常用命令</h1><h2 id="1-redis命令"><a href="#1-redis命令" class="headerlink" title="1.redis命令"></a>1.redis命令</h2><pre><code>1 redis执行了make install后，redis的课执行文件都会自动复制到 /usr/local/bin 目录
 2 redis-server        redis服务器
 3 redis-cli            redis命令行客户端
 4 redis-benchmark        redis性能测试工具
 5 redis-check-aof        aof文件修复工具
 6 redis-check-dump    rdb文件检查工具</code></pre>
-<h3 id="2-停止Redis命令"><a href="#2-停止Redis命令" class="headerlink" title="2.停止Redis命令"></a>2.停止Redis命令</h3><pre><code># 停止Redis命令
+<h2 id="2-停止Redis命令"><a href="#2-停止Redis命令" class="headerlink" title="2.停止Redis命令"></a>2.停止Redis命令</h2><pre><code># 停止Redis命令
 redis-cli shutdown</code></pre>
-<h2 id="3-启动-redis-命令"><a href="#3-启动-redis-命令" class="headerlink" title="3.启动 redis 命令"></a>3.启动 redis 命令</h2><h3 id="1-启动-redis-server"><a href="#1-启动-redis-server" class="headerlink" title="(1). # 启动 redis-server"></a>(1). # 启动 redis-server</h3><pre><code>1 redis-server</code></pre>
-<h3 id="2-带配置文件启动"><a href="#2-带配置文件启动" class="headerlink" title="(2). # 带配置文件启动"></a>(2). # 带配置文件启动</h3><pre><code># 注意配置文件路径
+<h2 id="3-启动-redis-命令"><a href="#3-启动-redis-命令" class="headerlink" title="3.启动 redis 命令"></a>3.启动 redis 命令</h2><h3 id="1-启动-redis-server"><a href="#1-启动-redis-server" class="headerlink" title="(1)启动 redis-server"></a>(1)启动 redis-server</h3><pre><code>1 redis-server</code></pre>
+<h3 id="2-带配置文件启动"><a href="#2-带配置文件启动" class="headerlink" title="(2)带配置文件启动"></a>(2)带配置文件启动</h3><pre><code># 注意配置文件路径
 redis-server ./redis.conf </code></pre>
-<h3 id="3-带配置文件启动-且指定某几个配置-配置名称前加-–"><a href="#3-带配置文件启动-且指定某几个配置-配置名称前加-–" class="headerlink" title="(3). # 带配置文件启动 且指定某几个配置 配置名称前加 –"></a>(3). # 带配置文件启动 且指定某几个配置 配置名称前加 –</h3><pre><code># 配置后台启动，且端口是 1123
+<h3 id="3-带配置文件启动-且指定某几个配置-配置名称前加-–"><a href="#3-带配置文件启动-且指定某几个配置-配置名称前加-–" class="headerlink" title="(3)带配置文件启动 且指定某几个配置 配置名称前加 –"></a>(3)带配置文件启动 且指定某几个配置 配置名称前加 –</h3><pre><code># 配置后台启动，且端口是 1123
 redis-server ./redis.conf --daemonize yes --port 1123</code></pre>
 <p> 会覆盖配置文件里面的值</p>
 <h2 id="4-redis命令行客户端"><a href="#4-redis命令行客户端" class="headerlink" title="4.redis命令行客户端"></a>4.redis命令行客户端</h2><h3 id="1-发送命令"><a href="#1-发送命令" class="headerlink" title="(1).发送命令"></a>(1).发送命令</h3><pre><code>1 第一种方式
@@ -40,6 +39,6 @@ redis-server ./redis.conf --daemonize yes --port 1123</code></pre>
 <script src="/js/scrollreveal.js"></script>
 <script src="/js/hc-sticky.js"></script>
 <script src="/js/canvas-nest.js" type="text/javascript" color="47,135,193" opacity="0.7" zIndex="-2" count="199"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/highlight.min.js"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/languages/java.min.js"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/languages/javascript.min.js"></script><script type="text/javascript">hljs.initHighlightingOnLoad();</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script src="/js/common.js?v=202102260900.js"></script>
-<script src="/js/index.js?v=202102260900.js"></script>
+<script src="/js/common.js?v=202102260902.js"></script>
+<script src="/js/index.js?v=202102260902.js"></script>
 </body></html>
