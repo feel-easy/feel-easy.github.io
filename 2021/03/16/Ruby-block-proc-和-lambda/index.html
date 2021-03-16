@@ -1,0 +1,447 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>Ruby block, proc 和 lambda</title><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><meta http-equiv="X-UA-Compatible" content="IE=Edge，chrome=1"><meta name="description" content=""><meta name="keywords"><meta name="author" content="心安"><link rel="short icon" href="/images/favicon.png"><link rel="icon" href="/images/favicon.png"><!--[if lt IE 9]>
+<script src="/js/modernizr.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="/css/iconfont.css">
+
+<link rel="stylesheet" href="/css/index.css?v=202103161738.css">
+<link rel="stylesheet" href="/css/info.css?v=202103161738.css">
+<link href="https://cdn.bootcss.com/highlight.js/9.15.9/styles/github.min.css" rel="stylesheet"><meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="Feel Easy" type="application/atom+xml">
+</head><body><header id="header" class="header-navigation"><nav><div class="logo"><a href="https://feel-easy.github.io">Feel Easy</a></div><h2 id="mnavh"><span class="navicon"></span></h2><ul id="starlist"><li><a href="/">首页</a></li><li><a href="/time">时间轴</a></li></ul><div class="searchbox"><div id="search_bar" class="search_bar"><input id="keyboard" placeholder="想搜点什么呢.." type="text" name="keyboard" autocomplete="off" class="input"><p class="search_ico"><span></span></p></div></div></nav></header><article><main><div class="con_warp"><div class="infosbox"><div class="newsview"><h3 class="news_title">Ruby block, proc 和 lambda</h3><div class="bloginfo"><ul><li class="author">作者：<a href="/">心安</a></li><li class="lmname"><a href="/"></a></li><li class="timer">时间：2021-03-16 17:36:08</li><li class="view"><span id="busuanzi_value_page_pv">99</span><span>次访问</span></li></ul></div><div class="tags"><a href="/tags/Ruby/" target="_blank">Ruby</a></div><div class="news_con"><h1 id="Ruby-block-proc-和-lambda"><a href="#Ruby-block-proc-和-lambda" class="headerlink" title="Ruby block, proc 和 lambda"></a>Ruby block, proc 和 lambda</h1><p>做为热身，从一些简单的例子开始,</p>
+<pre><code>def f1
+  yield
+end
+
+def f2(&amp;p)
+  p.call
+end
+
+def f3(p)
+  p.call
+end
+
+f1 &#123; puts &quot;f1&quot; &#125;
+
+f2 &#123; puts &quot;f2&quot; &#125;
+
+f3(proc&#123; puts &quot;f3&quot;&#125;)
+
+f3(Proc.new&#123;puts &quot;f3&quot;&#125;)
+
+f3(lambda&#123;puts &quot;f3&quot;&#125;)</code></pre>
+<p>若你用的是 ruby1.9 及以上的版本，还可以这样,</p>
+<pre><code>f3(-&gt; &#123;puts &quot;f3&quot;&#125;)</code></pre>
+<p>上面是 block, proc 和 lambda 的一些基本用法。</p>
+<h3 id="block"><a href="#block" class="headerlink" title="block"></a>block</h3><p>先说说 block, ruby 中的 block 是方法的一个重要但非必要的组成部分，们可以认为方法的完整定义类似于，</p>
+<pre><code>def f(零个或多个参数, &amp;p)
+  ...
+end</code></pre>
+<p>注意&amp;p 不是参数，&amp;p 类似于一种声明，当方法后面有 block 时，会将 block 捕捉起来存放到变量 p 中，如果方法后面没有 block，那么&amp;p 什么也不干。</p>
+<pre><code>def f(&amp;p)
+end
+
+f(1)  #=&gt; 会抛出ArgumentError: wrong number of arguments (1 for 0)异常
+
+f()  #=&gt; 没有异常抛出
+
+f() &#123; puts &quot;f&quot;&#125; #=&gt; 没有异常抛出</code></pre>
+<p>从上面代码的运行结果可以知道&amp;p 不是参数</p>
+<pre><code>def f(a)
+  puts a
+end
+
+f(1) &#123; puts 2&#125;  #=&gt; 没有异常抛出，输出1</code></pre>
+<p>所以任何方法后面都可以挂载一个 block，如果你定义的方法想使用 block 做点事情，那么你需要使用 yield 关键字或者&amp;p</p>
+<pre><code>def f1
+  yield
+end
+
+def f2(&amp;p)
+  p.call
+end</code></pre>
+<p>此时 f1, f2 执行时后面必须挂一个 block，否则会抛出异常，f1 抛出 LocalJumpError: no block given (yield) 的异常,f2 抛出 NoMethodError: undefined method ‘call’ for nil:NilClass 的异常, ruby 提供了<code>block_given?</code>方法来判断方法后面是否挂了 block，于是们可以这样修改 f1 和 f2，</p>
+<pre><code>def f1
+ yield if block_given?
+end
+
+def f2(&amp;p)
+  p.call if block_given?
+end</code></pre>
+<p>这样的话,f1 和 f2 后面无论挂不挂 block 都不会抛异常了。 们再来看看 f2 修改前抛出的 NoMethodError: undefined method ‘call’ for nil:NilClass 异常，这种说明当 f2 后面没有挂 block 的时候 p 是 nil，那么们给 f2 挂个 block，再打印出 p，看看 p 究竟是什么，</p>
+<pre><code>def f2(&amp;p)
+  puts p.class
+  puts p.inspect
+  p.call
+end
+
+f2 &#123;&#125; # 输出Proc和类似&lt;Proc:0x007fdc72829780@(irb):21&gt;</code></pre>
+<p>这说明 p 是一个 Proc 实例对象，在 ruby 中，&amp;还可以这么用，<code>[1,2] &amp; [2,3]</code> 或者 <code>puts true if 1 &amp;&amp; 1</code> 或者在某个类中将它作为一个方法名。</p>
+<p>很多 ruby 老鸟会写类似下面的代码,</p>
+<p><code>[&quot;1&quot;, &quot;2&quot;, &quot;3&quot;].map(&amp;:to_i)</code>，其效果和<code>[&quot;1&quot;, &quot;2&quot;, &quot;3&quot;].map &#123;|i| i.to_i &#125;</code>一样, 但简洁了许多，并且更加拉风。 这里的魔法在于符号&amp;会触发:to_i 的 to_proc 方法, to_proc 执行后会返回一个 proc 实例， 然后&amp;会把这个 proc 实例转换成一个 block,们需要要明白 map 方法后挂的是一个 block，而不是接收一个 proc 对象做为参数。&amp;:to_i 是一个 block，block 不能独立存在，同时你也没有办法直接存储或传递它，必须把 block 挂在某个方法后面。</p>
+<p>:to_i 是 <strong>Symbol</strong> 类的实例, <strong>Symbol</strong> 中的 to_proc 方法的实现类似于，</p>
+<pre><code>class Symbol
+
+  def to_proc
+    Proc.new &#123;|obj| obj.send(self) &#125;
+  end
+
+end</code></pre>
+<p>同理们可以给自己写的类定义 to_proc 方法,然后使用&amp;耍下酷，比如，</p>
+<pre><code>class AddBy
+
+  def initialize(num = 0)
+    @num = num
+  end
+
+  def to_proc
+    Proc.new &#123;|obj| obj.send(&#39;+&#39;, @num)&#125;
+  end
+
+end
+
+add_by_9 = AddBy.new(9)
+puts [1,2,3].map(&amp;add_by_9) #输出 [10, 11, 12]</code></pre>
+<p>在 ruby 中, block 有形,它有时候是这样</p>
+<pre><code>do |...|
+  ...
+end</code></pre>
+<p>有时候是这样</p>
+<pre><code>&#123;|...| ...&#125;</code></pre>
+<p>或者类似 &amp;p, &amp;:to_i, &amp;add_by_9 之类，但是它无体，无体的意思就是说 block 无法单独存在，必须挂在方法后面，并且你没有办法直接把它存到变量里，也没有办法直接将它作为参数传递给方法，所以当你想存储，传递 block 时，你可以使用 proc 对象了，</p>
+<pre><code> p = Proc.new(&amp;:to_i)
+ p = Proc.new &#123;|obj| obj.to_i &#125; 
+ p = Proc.new do |obj|
+   obj.to_i
+ end
+ p = proc(&amp;:to_i)
+ p = proc &#123;|obj| obj.to_i&#125;
+ p = proc do |obj|
+   obj.to_i
+ end
+
+def make_proc(&amp;p)
+  p
+end
+
+p = make_proc(&amp;:to_i)
+p = make_proc do |obj|
+  obj.to_i
+end
+p = make_proc &#123;|obj| obj.to_i &#125;</code></pre>
+<p>虽然在开发中经常用到 block，但是很少显式地去使用 Proc 或 proc 去实例化 block，比如几乎没有写过这样的代码,</p>
+<pre><code>f(Proc.new &#123;|...| ...&#125;)
+
+f(proc &#123;|...| ...&#125;)
+
+p =  Proc.new &#123;|...| ...&#125; #然后在某个地方p.call(...)或者将p传递给某个方法，比如f(p)</code></pre>
+<p>在使用 block 时，会忽略 proc 的存在，将 proc 定位为一个幕后的工作者。经常写类似下面的代码，</p>
+<pre><code>def f(...)
+  ...
+  yield
+  ...
+end
+
+def f(..., &amp;p)
+  ...
+  p.call
+  ...
+end
+
+def f(..., &amp;p)
+  instance_eval &amp;p
+  ...
+end
+
+def f(..., &amp;p)
+  ...
+  defime_method m, &amp;p
+  ...
+end</code></pre>
+<p>有些新手会写类似下面的一执行就会报错的代码,</p>
+<pre><code>def f(..., &amp;p)
+  instance_eval p
+end
+
+def f(..., p)
+  instance_eval p.call
+end</code></pre>
+<p>也有这样写的,</p>
+<pre><code>def f(..., &amp;p)
+  instance_eval do
+    p.call
+  end
+end</code></pre>
+<p>或者</p>
+<pre><code>def f(...)
+  instance_eval do
+    yield
+  end
+end</code></pre>
+<p>甚至写过类似下面的代码，</p>
+<pre><code>def f(...)
+  instance_eval yield
+end</code></pre>
+<p>我们经常在该挂 block 的时候，却把 proc 对象当参数传给方法了， 或者不明白&amp;p 就是 block 可以直接交给方法使用，曾经也犯过这样的错误就是因为没有把 block 和 proc 正确的区分开来, <strong>&amp;p 是 block, p 是 proc，不到万不得已的情况下不要显式地创建 proc</strong>，每当对 block 和 proc 之间的关系犯糊涂时，就会念上几句。</p>
+<p>再来聊聊 yield 和&amp;p，我们经常这样定义方法，</p>
+<pre><code>def f(...)
+  yield(...)
+end
+
+def f(..., &amp;p)
+  p.call(...)
+end</code></pre>
+<p>yield 和 call 后面都可以接参数，如果你是这样定义方法</p>
+<pre><code>def f(...)
+  yield 1, 2
+end</code></pre>
+<p>那么可以这样执行代码,</p>
+<pre><code>f(...) do |i, j|
+  puts i
+  puts j
+end</code></pre>
+<p>但是这样做也不会有错,</p>
+<pre><code>f(...) do
+  ...
+end</code></pre>
+<p>p.call(…) 的情况类似, 也就是说 block 和 proc 都不检查参数 (其实通过 proc 方法创建的 proc 在 1.8 是严格检查参数的，但是在 1.9 及以上的版本是不检查参数的)，为什么 block 和 proc 不检查参数呢?其实这个很好理解，因为在实际应用中你可能需要在一个方法中多次调用 block 或者 proc 并且给的参数个数不一样，比如,</p>
+<pre><code>def f()
+  yield 0
+  yield 1, 2
+end
+
+def ff(&amp;p)
+  p.call 0
+  p.call 1, 2, 3
+end
+
+ff do |a1, a2, a3|
+  puts a1   
+  puts a2
+   puts a3
+end</code></pre>
+<p>由于方法后面只能挂一个 block，所以要实现上面的代码功能，就不能去严格检查参数了。</p>
+<p>转入正题，这两种方式效果差不多，都能很好地利用 block。使用 yield，看起来简洁，使用&amp;p，看起来直观，并且你可以将&amp;p 传给其他方法使用。 但是在 <strong>ruby1.8</strong> 的版本你不应像下面这样做,</p>
+<pre><code>def f1(...)
+  eval(&quot;yield&quot;)
+end</code></pre>
+<p>可以,</p>
+<pre><code>def f2(..., &amp;p)
+  eval(&quot;p.call&quot;)
+end
+f1(...) &#123;&#125;  # 会抛异常
+f2(...) &#123;&#125;  # 正常运行</code></pre>
+<p>当然上面这种用法很少见，但是却被碰到了，经常写一些方法去请求外部的 api，有时这些外部的 api 不是特别稳定，时不时会遇到一些 bad respoense, timeout 错误，针对这些错误，应该立即重发报文重试，对于其他异常就直接抛异常。于是写了一个 try 方法来满足这个需求，</p>
+<pre><code>  def try(title, options = &#123; &#125;, &amp;p)
+    ee = &#39;#&#123;e&#125;&#39;
+    tried_times = 0
+    max_times = options[:max_times] || 3
+    exceptions = options[:on] || Exception
+    exceptions = [exceptions] if !exceptions.is_a?(Array)
+    rescue_text = &lt;&lt;-EOF
+      begin
+        p.call
+      rescue #&#123;exceptions.join(&#39;,&#39;)&#125; =&gt; e
+        Rails.logger.info(&quot;#&#123;title&#125;发生异常#&#123;ee&#125;&quot;)
+        if (tried_times += 1) &lt; max_times
+          Rails.logger.info(&quot;开始重试#&#123;title&#125;--第#&#123;tried_times&#125;次重试&quot;)
+          retry 
+        end
+        raise e
+      end
+    EOF
+    eval rescue_text
+  end
+
+try(&#39;某某api&#39;, :max_times =&gt; 2, :on =&gt; [Net::HTTPBadResponse, Timeout::Error]) do
+  open(api_url)
+end</code></pre>
+<p>最开始用的是 yield，结果在 <strong>ree</strong> 下执行 try 方法时会报错，后来改成使用&amp;p 就通过了。</p>
+<p>通过试验发现在 <strong>ruby1.9</strong> 及以上版本已经没有这种差异了。</p>
+<p>做个小结, <strong>block 和 proc 是两种不同的东西, block 有形无体，proc 可以将 block 实体化, 可以把&amp;p 看做一种运算，其中&amp;触发 p 的 to_proc 方法，然后&amp;会将 to_proc 方法返回的 proc 对象转换成 block</strong> 。</p>
+<p>其中 proc 对象的 to_proc 方法返回自身。</p>
+<pre><code>p = proc &#123;&#125;
+p.equal? p.to_proc  # 返回true</code></pre>
+<h3 id="lambda"><a href="#lambda" class="headerlink" title="lambda"></a>lambda</h3><p>lambda 是匿名方法, lambda 和 proc 也是两种不同的东西，但是在 ruby 中 lambda 只能依附 proc 而存在，这点和 block 不同，block 并不依赖 proc。</p>
+<pre><code>l = lambda &#123;&#125;
+puts l.class </code></pre>
+<p>在 <strong>ruby1.8</strong> 中输出的信息类似 #Proc:0x0000000000000000@irb):1( 在 <strong>ruby1.9</strong> 及以上版本输出的信息类似 #Proc:0x007f85548109d0@irb):1lambda)(，注意 <strong>1.9</strong> 及以上版本的输出多了 <strong>(lambda)**，从这里可以理解 ruby 的设计者们确实在有意的区分 lambda 和 proc，并不想把 lambda 和 proc 混在一起,如同 ruby 中没有叫 Block 的类，除非你自己定义一个，ruby 中也没有叫 Lambda 的类，于是将 lambda 对象化的活儿就交给了 Proc，于是令人头大的情况出现了，当你用 lambda 弄出了一个匿名方法时，发现它是一个 proc 对象，并且这个匿名方法能干的活，proc 对象都能做，于是们这些码农不淡定了，<code>Proc.new &#123;&#125;</code>这样可以, <code>proc &#123;&#125;</code>这样也没有问题, <code>lambda &#123;&#125;</code>这样做也不错, <code>-&gt;&#123;&#125;</code>这个还是能行，平时吃个饭都为吃什么左右为难，现在一下子多出了四种差不多的方案来实现同一件事情，确实让人不好选择，特别是有些码农还有点小洁癖，如果在代码里一会儿看到<code>proc&#123;&#125;</code>, 一会儿看到<code>lambda&#123;&#125;</code>,这多不整洁啊，让人心情不畅快。在这里们认定 lambda 或者 -&gt; 弄出的就是一个匿名方法，记做 **l</strong>, 即使它披着 proc 的外衣，proc 或者 Proc.new 创建的就是一个 proc 对象,记做 <strong>p</strong> 在 ruby 各个版本中, <strong>l</strong> 和 <strong>p</strong> 是有一些差别的。</p>
+<p>定义一些方法，</p>
+<pre><code>def f0()
+  p = Proc.new &#123;return 0&#125;
+  p.call
+  1
+end
+
+def f1()
+  p = proc &#123; return 0 &#125;
+  p.call
+  1
+end
+
+def f2()
+  l = lambda &#123; return 0&#125;
+  l.call
+  1
+end
+
+def f3(p)
+  instance_eval &amp;p
+  1
+end
+
+class A
+end
+
+def f4(p)
+  A.class_eval &amp;p
+  1
+end
+
+p1 = Proc.new &#123; &#125;
+p2 = proc &#123;&#125;
+l  = lambda &#123;&#125;
+
+def f5()
+  yield 1, 2
+end
+
+f5 &#123;&#125;
+f5 &#123;|i|&#125;
+f5 &#123;|i,j|&#125;
+f5 &#123;|i,j,k|&#125;</code></pre>
+<p><a target="_blank" rel="noopener" href="https://l.ruby-china.com/photo/891b1782bb0db9593b4efda25e2e948e.png"><img src="https://l.ruby-china.com/photo/891b1782bb0db9593b4efda25e2e948e.png" alt="img"></a></p>
+<p>lambda 和 proc 之间的区别除了那个经常用做面试题目的经典的 return 之外，还有一个区别就是 lambda 不能完美的转换为 block(这点可以通过 f3 和 f4 执行的过程得证)，而 proc 可以完美的转换为 block,注意，说的 lambda 指的是用 lambda 方法或者-&gt;符号生成的 proc，当然和方法一样 lambda 是严格检查参数的，这个特点也和 proc 不一样。</p>
+<p>从上面的数据对比来看，在 1.8 版本，lambda 和 proc 方法生成的 proc 对象的行为是一致的，但在 1.9 以上和 jruby 的版本中,lambda 和 proc 的不同处增多，可以认为 ruby 的设计者们并不想把 lambda 和 proc 混同为一件事物。如前面所讲，proc 的主要作用是对象化 block 和 lambda，并且 proc 在行为上更接近于 block。</p>
+<h3 id="retrun-的几个试验"><a href="#retrun-的几个试验" class="headerlink" title="retrun 的几个试验"></a>retrun 的几个试验</h3><pre><code>def f0()
+  p = Proc.new &#123; return 0&#125;
+  p.call
+  1
+end
+
+def f1()
+  l = lambda &#123; return 0&#125;
+  l.call
+  1
+end
+
+f0 # 返回0
+f1 # 返回1</code></pre>
+<p>如果你能够理解 proc 在行为上更像 block，lambda 其实就是方法只不过是匿名的，那么你对上面的结果不会感到惊讶。</p>
+<p>如果把 f0,f1 做一些修改，就更容易理解上面的结果了。</p>
+<pre><code>def f0()
+  return 0
+  1
+end
+
+def f1()
+  def __f1
+    return 0
+  end
+  __f1
+  1
+end
+
+f0 # 返回0
+f1 # 返回1</code></pre>
+<p><strong>return 只能在方法体里执行</strong>，</p>
+<pre><code>p = Proc.new &#123; return 0 &#125;
+l = lambda &#123; return 0 &#125;
+
+p.call # 报LocalJumpError
+l.call # 返回0</code></pre>
+<p>构造 p 的时候没有使用 proc {return 0}，因为在 <strong>ruby1.8</strong> 中, proc {return 0}的行为和 lambda 一样，比如在 <strong>ruby1.8</strong> 中，</p>
+<pre><code>def f(p)
+  p.call
+  1
+end
+
+p = proc &#123; return 0 &#125;
+l = lambda &#123; return 0 &#125;
+
+f(p)  # 返回1
+f(l)  # 返回1
+
+p.call # 返回0
+l.call # 返回0
+
+def f(p)
+  p.call
+  1
+end
+
+p = Proc.new &#123; return 0 &#125;
+l = lambda.new &#123; return 0&#125;
+
+f(p)  # 报LocalJumpError
+f(l)  # 返回1</code></pre>
+<p>感觉 proc 中的 return 能记住 proc 生成时其 block 的位置，然后无论 proc 在哪里调用，都会从 proc 生成时其 block 所在位置处开始 return，有下面的代码为证:</p>
+<pre><code>def f(p)
+  p.call
+  1
+end
+
+def f2()
+  Proc.new &#123; return 0 &#125;
+end
+
+def f3()
+  lambda &#123; return 0 &#125;
+end
+
+p = f2()
+l = f3()
+
+f(p)  # 报LocalJumpError: unexpected return，from (irb):29:in `f2&#39;
+f(l)  # 返回1</code></pre>
+<p>在 1.8, ree, jruby, 1.9, 2.0 各版本都测试过，结果一样。</p>
+<p>再看看下面的代码,</p>
+<pre><code>def f0(&amp;p)
+  p.call
+  1
+end
+
+def f1()
+  yield
+  1
+end
+
+f0 &#123; return 0&#125;  # LocalJumpErrorw
+f1 &#123; return 0&#125;  # LocalJumpErrorw
+
+f0(&amp;Proc.new&#123;return 0&#125;) # LocalJumpError
+f0(&amp;lambda&#123;return 0&#125;)   # 返回1
+
+def f2(&amp;p)
+  p
+end
+
+def f3()
+  p = f2 do
+    return 0
+  end
+  p.call
+  1
+end
+
+f3 # 返回0</code></pre>
+<p>们重点看看 f3 中的 proc p，它虽然是从 f2 中生成返回的，但是 p 生成时其 block 是处在在 f3 的方法体内，这个类似于，</p>
+<pre><code>def f3()
+  p = Proc.new &#123; return 0&#125;
+  p.call
+  1
+end</code></pre>
+<p>所以执行 f3 时，没有异常抛出，返回 0。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>当你想写出类似于 f do …; end 或者 f {…}的代码时，请直接使用 block,通过 yield, &amp;p 就能达到目的，当你想使用 proc 时，其实此时绝大部分的情况是你实际想用 lambda,请直接使用 lambda{}或者-&gt;{}就可以了， 尽量不要显示地使用 Proc.new{} 或者 proc{}去创建 proc。</p>
+<p>废话说了一大堆，其实最想说的是: <strong>用 block，用 lambda，不要用 proc，让 proc 做好自己的幕后工作就好了</strong>。</p>
+</div></div><div class="nextinfo"><p>上一篇：没有了</p><p>下一篇：<a href="/2021/02/26/golang-%E9%93%BE%E6%8E%A5redis/">golang 链接redis</a></p></div><div class="news_pl"><div id="comment_container"></div></div></div></div></main><aside class="r_box"><div class="card box"><h2>我的名片</h2><div class="box_con"><p>网名: 心安</p>
+<p>技术栈：ruby vue python </p>
+<p>Email：l.wang@rccchina.com</p>
+</div></div><div class="category box"><h2>文章分类</h2><div class="box_con"><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%97%AE%E9%A2%98/">问题</a><span class="category-list-count">1</span></li></ul></div></div><div class="wechat box"><h2>我的微信</h2><div class="box_con"><img src="/images/wechat.png"></div></div></aside></article><footer><section class="footer_bottom"><div class="footer_container"><p class="copyright">Design by
+<a href='https://feel-easy.github.io/' target='_blank'>Feel Easy</a>
+</p><ul class="social_network"></ul></div></section></footer><div class="cd-top"><i class="iconfont icon-top"></i></div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/scrollreveal.js"></script>
+<script src="/js/hc-sticky.js"></script>
+<script src="/js/canvas-nest.js" type="text/javascript" color="47,135,193" opacity="0.7" zIndex="-2" count="199"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/highlight.min.js"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/languages/java.min.js"></script><script src="https://cdn.bootcss.com/highlight.js/9.15.9/languages/javascript.min.js"></script><script type="text/javascript">hljs.initHighlightingOnLoad();</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="/js/common.js?v=202103161738.js"></script>
+<script src="/js/index.js?v=202103161738.js"></script>
+</body></html>
