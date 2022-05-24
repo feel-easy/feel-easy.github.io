@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-05-20T06:18:04.053Z</updated>
+  <updated>2022-05-24T09:00:40.583Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Mac redis 开机自启动</title>
+    <link href="http://example.com/2022/05/24/Mac-redis-%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E5%8A%A8/"/>
+    <id>http://example.com/2022/05/24/Mac-redis-%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E5%8A%A8/</id>
+    <published>2022-05-24T08:56:05.000Z</published>
+    <updated>2022-05-24T09:00:40.583Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="1-创建-plist配置文件"><a href="#1-创建-plist配置文件" class="headerlink" title="1 创建.plist配置文件"></a>1 创建.plist配置文件</h3><p>为了让 Redis 在启动时自动启动，我使用的是 launchd。在 <code>/Library/LaunchDaemons</code> 中创建一个简单的xml文档。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim &#x2F;Library&#x2F;LaunchDaemons&#x2F;redis-server.plist</span><br></pre></td></tr></table></figure><p><strong>注意：</strong></p><ul><li>先执行  <code>which redis-server</code> 查看redis的安装位置；</li><li>再执行 <code>sudo find / -name redis.conf</code> 查看reids.conf的位置。</li></ul><p>然后正确填写以下代码：</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">plist</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">&quot;-//Apple//DTD PLIST 1.0//EN&quot;</span> <span class="meta-string">&quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">&quot;1.0&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>Label<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>redis-server<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>ProgramArguments<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">string</span>&gt;</span>/usr/local/bin/redis-server<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">string</span>&gt;</span>/usr/local/etc/redis.conf<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>RunAtLoad<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">true</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure><p>如果您没有 <code>redis.conf</code> ，则只需将其从此xml文件中删除即可。</p><h3 id="2-将-redis-server-plist-加载到-launchd-中"><a href="#2-将-redis-server-plist-加载到-launchd-中" class="headerlink" title="2 将 redis.server.plist 加载到 launchd 中"></a>2 将 redis.server.plist 加载到 launchd 中</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo launchctl load &#x2F;Library&#x2F;LaunchDaemons&#x2F;redis-server.plist</span><br></pre></td></tr></table></figure><p>此时 Mac 开机或重启都会自动启动 redis</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h3 id=&quot;1-创建-plist配置文件&quot;&gt;&lt;a href=&quot;#1-创建-plist配置文件&quot; class=&quot;headerlink&quot; title=&quot;1 创建.plist配置文件&quot;&gt;&lt;/a&gt;1 创建.plist配置文件&lt;/h3&gt;&lt;p&gt;为了让 Redis 在启动时自动启动，我使用</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>golang结构体标签</title>
