@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>MYSQL  插入数据避免主键冲突  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">MYSQL  插入数据避免主键冲突</h1>
+<article class="post markdown-style">
+  <h3 id="1-不存在则插入，存在则更新"><a href="#1-不存在则插入，存在则更新" class="headerlink" title="1.不存在则插入，存在则更新"></a>1.不存在则插入，存在则更新</h3><h4 id="1-1-on-duplicate-key-update"><a href="#1-1-on-duplicate-key-update" class="headerlink" title="1.1 on duplicate key update"></a>1.1 on duplicate key update</h4><p>如果插入的数据会导致UNIQUE 索引或PRIMARY KEY发生冲突/重复，则执行UPDATE语句，例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> `student`(`name`, `age`) <span class="keyword">VALUES</span>(<span class="string">&#x27;Jack&#x27;</span>, <span class="number">19</span>)</span><br><span class="line">  <span class="keyword">ON</span> DUPLICATE KEY </span><br><span class="line">  <span class="keyword">UPDATE</span> `age`<span class="operator">=</span><span class="number">19</span>; <span class="comment">-- If will happen conflict, the update statement is executed</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="1-2-replace-into"><a href="#1-2-replace-into" class="headerlink" title="1.2 replace into"></a>1.2 replace into</h3><p>如果插入的数据会导致<code>UNIQUE 索引</code>或<code>PRIMARY KEY</code>发生冲突/重复，则<strong>先删除旧数据再插入最新的数据</strong>，例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REPLACE <span class="keyword">INTO</span> `student`(`name`, `age`) <span class="keyword">VALUES</span>(<span class="string">&#x27;Jack&#x27;</span>, <span class="number">18</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="2-避免重复插入"><a href="#2-避免重复插入" class="headerlink" title="2. 避免重复插入"></a>2. 避免重复插入</h3><p>关键字/句：<code>insert ignore into</code>，如果插入的数据会导致<code>UNIQUE索引</code>或<code>PRIMARY KEY</code>发生冲突/重复，则忽略此次操作/不插入数据，例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> IGNORE <span class="keyword">INTO</span> `student`(`name`, `age`) <span class="keyword">VALUES</span>(<span class="string">&#x27;Jack&#x27;</span>, <span class="number">18</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 0 row(s) affected</span></span><br></pre></td></tr></table></figure>
+<p>这里已经存在<code>name=&#39;Jack&#39;</code>的数据，所以会忽略掉新插入的数据，受影响行数为<code>0</code>，表数据不变。</p>
+<p>以上。</p>
+
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2023/01/12/Docker%20Compose%20%E7%BD%91%E7%BB%9C%E8%AE%BE%E7%BD%AE/">prev</a>
+    
+
+    
+    <p>last update time 2023-06-06</p>
+    
+    
+        <a class="extend next post-next" href="/2022/07/22/Go%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E5%A4%A7%E5%85%A8/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

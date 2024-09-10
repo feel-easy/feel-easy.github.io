@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>GRPC  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">GRPC</h1>
+<article class="post markdown-style">
+  <h3 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h3><ul>
+<li><p>远程过程调用（Remote Procedure Call，RPC）是一个计算机通信协议</p>
+</li>
+<li><p>该协议允许运行于一台计算机的程序调用另一台计算机的子程序，而程序员无需额外地为这个交互作用编程</p>
+</li>
+<li><p>如果涉及的软件采用面向对象编程，那么远程过程调用亦可称作远程调用或远程方法调用</p>
+</li>
+</ul>
+<h3 id="gRPC"><a href="#gRPC" class="headerlink" title="gRPC"></a>gRPC</h3><ul>
+<li>gRPC由google开发，是一款语言中立、平台中立、开源的远程过程调用系统</li>
+<li>gRPC客户端和服务端可以在多种环境中运行和交互，例如用java写一个服务端，可以用go语言写客户端调用</li>
+</ul>
+<h3 id="Protobuf"><a href="#Protobuf" class="headerlink" title="Protobuf"></a>Protobuf</h3><ul>
+<li>rotobuf是由Google开发的一套对数据结构进行序列化的方法，可用做通信协议，数据存储格式，等等。其特点是不限语言、不限平台、扩展性强，就像XML一样。</li>
+</ul>
+<p><strong>特点</strong>：</p>
+<blockquote>
+<p>1、操作更简单。</p>
+<p>2、序列化后生成的代码体积更小</p>
+<p>3、解析速度更快。（比xml快两个数量级）</p>
+<p>4、与XML相比，protobuf的缺点是不易读。众所周知，XML是一种自描述语言，一看就可知道其作用，见文知意。而protobuf序列化后是一串二进制代码，如果没有对应的协议格式（即.proto文件），想要读懂它难如登天。另外，如果目标是一种基于文版的标签式文档（如html），则XML更具优势</p>
+</blockquote>
+<p>关于protobuf的历史及其特点，可参考Google网站：<a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/overview?hl=zh-TW">点击打开链接</a></p>
+<p><strong>语法规则</strong></p>
+<p>protobuf协议的文件后缀名为.proto。一个简单的protobuf协议如下：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">		<span class="comment">//标识符| 类型 | 字段名字|  标号</span></span><br><span class="line">    <span class="keyword">required</span> <span class="built_in">string</span> name = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">required</span> <span class="built_in">int32</span> id = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">optional</span> <span class="built_in">string</span> email = <span class="number">3</span>;</span><br><span class="line">    <span class="class"><span class="keyword">enum</span> <span class="title">PhoneType</span> </span>&#123;</span><br><span class="line">      MOBILE = <span class="number">0</span>;</span><br><span class="line">      HOME = <span class="number">1</span>;</span><br><span class="line">      WORK = <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="class"><span class="keyword">message</span> <span class="title">PhoneNumber</span> </span>&#123;</span><br><span class="line">      <span class="keyword">required</span> <span class="built_in">string</span> number = <span class="number">1</span>;</span><br><span class="line">      <span class="keyword">optional</span> PhoneType type = <span class="number">2</span> [default = HOME];</span><br><span class="line">    &#125;</span><br><span class="line">  	<span class="keyword">repeated</span> PhoneNumber phone = <span class="number">4</span>;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="class"><span class="keyword">message</span> <span class="title">AddressBook</span> </span>&#123;</span><br><span class="line"> 		<span class="keyword">repeated</span> Person person = <span class="number">1</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>1、标识符</p>
+<blockquote>
+<p>protobuf协议的标识符为message或enum，如示例中的Person和PhoneType。message标识一条消息，enum标识一个枚举类型。使用protobuf编译器将协议文件编译后，message和enum都会生成一个类。</p>
+</blockquote>
+<p>2、字段</p>
+<p>协议字段格式如下：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">role type name = tag [default value];</span><br></pre></td></tr></table></figure>
+<p>role有三种取值：</p>
+<blockquote>
+<p><strong>required</strong>：表示该字段必须有值，不能为空，否则message被认为是未初始化的。如果试图build一个未初始化的message将会抛出RuntimeException。解析未初始化的message会抛出IOException。</p>
+<p><strong>optional</strong>：表示该段为可选值，可以不进行设置。如果不设置，会设置一个默认值。可以设置一个默认值，正如示例中的type字段。否则使用系统默认值，数字类型默认为0；字符串类型默认为空字符串；逻辑类型默认为false；内部自定义的message，默认值通常是message的实例或原型。</p>
+<p><strong>repeated</strong>：表示该字段可以重复，可等同于动态数组。</p>
+<p>注意：使用<strong>required</strong>字段一定要小心，因为该字段是永久性的。如果以后因为某种原因，想不用该字段，或者要将该字段改成optional或者repeated，那么使用旧接口读取新的协议时，如果发现没有该字段，他们会认为该字段是不完整的，会拒接接收该消息，或者直接丢弃。</p>
+</blockquote>
+<p>3、编码</p>
+<table>
+<thead>
+<tr>
+<th>wireType</th>
+<th>编码方式</th>
+<th>编码长度</th>
+<th>储存方式</th>
+<th>代码数据类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>Varint</td>
+<td>变长（1-10个字节）</td>
+<td>T-V</td>
+<td>int32,int64,uint32,uint64,bool,enum (负数使用sint32,sint64,)</td>
+</tr>
+<tr>
+<td>1</td>
+<td>64-bit</td>
+<td>固定8字节</td>
+<td>T-V</td>
+<td>fixed64，sfixed64,double</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Length-delimi</td>
+<td>变长</td>
+<td>T-L-V</td>
+<td>String</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Start group</td>
+<td>弃用</td>
+<td>弃用</td>
+<td>弃用</td>
+</tr>
+<tr>
+<td>4</td>
+<td>End group</td>
+<td>弃用</td>
+<td>弃用</td>
+<td>弃用</td>
+</tr>
+<tr>
+<td>5</td>
+<td>32-bit</td>
+<td>固定4字节</td>
+<td>T-V</td>
+<td>Fixed32，sfixed32,float</td>
+</tr>
+</tbody></table>
+<p>T - V 编码举例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">message request &#123;</span><br><span class="line">    int63 user_id = 1; // tagNum = 1, wireType = 0, </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#123;&quot;user_id&quot;:2&#125; </span><br><span class="line">json需要： 14个字符 112字节</span><br><span class="line">protobuf： 2个字节 相差52倍</span><br><span class="line"></span><br><span class="line">假设 value为 2, 则编码出的T-V为： </span><br><span class="line">+-----+---+-----------------+</span><br><span class="line">|00001|000|00000010|</span><br><span class="line">+-----+---+-----------------+</span><br><span class="line">tagNum type   data</span><br><span class="line"></span><br><span class="line">&#123;&quot;user_id&quot;:300&#125; </span><br><span class="line">json需要： 16个字符 128字节</span><br><span class="line">protobuf： 3个字节  差42倍</span><br><span class="line"></span><br><span class="line">假设 value为 300, 则编码出的T-V为： </span><br><span class="line">300(00000001 00101100)</span><br><span class="line"> 第一个字节    第二       第三</span><br><span class="line">+-----+---+-----------------------+</span><br><span class="line">|00001|000| 10101100  00000010| 下个T-V</span><br><span class="line">+-----+---+-----------------------+</span><br><span class="line">tagNum type     data</span><br><span class="line"></span><br><span class="line">Tag高位=0： 一个byte</span><br><span class="line">data的第一个字节最高位为1，说明下一个字节还要继续读</span><br></pre></td></tr></table></figure>
+<p>T - L - V 就是在上面的基础上增加了length，用来表达变长的内容：</p>
+<p>嵌套对象编码举例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">message request &#123;</span><br><span class="line">    User user = 1; // tagNum = 1, wireType = 2, </span><br><span class="line">&#125;</span><br><span class="line">message User &#123;</span><br><span class="line">    int64 user_id = 1; // tagNum = 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">假设 request = &#123; user_id: 2&#125;, 则编码出的T-L-V为： </span><br><span class="line">    Tag     length        value</span><br><span class="line">                       Tag      value</span><br><span class="line">+---------+--------+---------+---------</span><br><span class="line">|00001010 |00000010|000010000|00000010|</span><br><span class="line"> 1&lt;&lt;3 | 2   2 byte   1&lt;&lt;3 | 0    2</span><br><span class="line"></span><br><span class="line">通过解request 知道第一个字段是User，再拿到第一个字段的value去解User，</span><br><span class="line">知道User第一个字段是int64，解析出data为2。 一个嵌套对象即解析完毕</span><br></pre></td></tr></table></figure>
+<h3 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h3><p><strong>流程：</strong></p>
+<ol>
+<li>编写<code>.proto</code>描述文件</li>
+<li>编译生成<code>.pb.go</code>文件</li>
+<li>服务端实现约定的接口并提供服务</li>
+<li>客户端按照约定调用<code>.pb.go</code>文件中的方法请求服务</li>
+</ol>
+<p><strong>项目结构：</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">|—— hello/</span><br><span class="line">    |—— client/</span><br><span class="line">        |—— main.go   // 客户端</span><br><span class="line">    |—— server/</span><br><span class="line">        |—— main.go   // 服务端</span><br><span class="line">|—— proto/</span><br><span class="line">    |—— hello/</span><br><span class="line">        |—— hello.proto   // proto描述文件</span><br><span class="line">        |—— hello.pb.go   // proto编译后文件</span><br></pre></td></tr></table></figure>
+<p><strong>编写描述文件：hello.proto</strong></p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>; <span class="comment">// 指定proto版本</span></span><br><span class="line"><span class="keyword">package</span> hello;     <span class="comment">// 指定默认包名</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 指定golang包名</span></span><br><span class="line"><span class="keyword">option</span> go_package = <span class="string">&quot;./hello&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义Hello服务</span></span><br><span class="line"><span class="class"><span class="keyword">service</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 定义SayHello方法</span></span><br><span class="line">    <span class="function"><span class="keyword">rpc</span> SayHello(HelloRequest) <span class="keyword">returns</span> (HelloResponse) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// HelloRequest 请求结构</span></span><br><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">HelloRequest</span> </span>&#123;</span><br><span class="line">    <span class="built_in">string</span> name = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// HelloResponse 响应结构</span></span><br><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">HelloResponse</span> </span>&#123;</span><br><span class="line">    <span class="built_in">string</span> <span class="class"><span class="keyword">message</span> = 1;</span></span><br><span class="line"><span class="class">&#125;</span></span><br></pre></td></tr></table></figure>
+<p><code>hello.proto</code>文件中定义了一个Hello Service，该服务包含一个<code>SayHello</code>方法，同时声明了<code>HelloRequest</code>和<code>HelloResponse</code>消息结构用于请求和响应。客户端使用<code>HelloRequest</code>参数调用<code>SayHello</code>方法请求服务端，服务端响应<code>HelloResponse</code>消息。一个最简单的服务就定义好了。</p>
+<p><strong>编译生成<code>.pb.go</code>文件</strong></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> proto/hello</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编译hello.proto</span></span><br><span class="line">$ protoc -I . --go_out=plugins=grpc:. ./hello.proto</span><br></pre></td></tr></table></figure>
+<p>在当前目录内生成的<code>hello.pb.go</code>文件，按照<code>.proto</code>文件中的说明，包含服务端接口<code>HelloServer</code>描述，客户端接口及实现<code>HelloClient</code>，及<code>HelloRequest</code>、<code>HelloResponse</code>结构体。</p>
+<blockquote>
+<p>注意：不要手动编辑该文件</p>
+</blockquote>
+<p><strong>实现服务端接口 <code>server/main.go</code></strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;net&quot;</span></span><br><span class="line"></span><br><span class="line">    pb <span class="string">&quot;rpc-demo/proto/hello&quot;</span> <span class="comment">// 引入编译生成的包</span></span><br><span class="line">    <span class="string">&quot;golang.org/x/net/context&quot;</span></span><br><span class="line">    <span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">    <span class="string">&quot;google.golang.org/grpc/grpclog&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    <span class="comment">// Address gRPC服务地址</span></span><br><span class="line">    Address = <span class="string">&quot;127.0.0.1:50052&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义helloService并实现约定的接口</span></span><br><span class="line"><span class="keyword">type</span> helloService <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// HelloService Hello服务</span></span><br><span class="line"><span class="keyword">var</span> HelloService = helloService&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// SayHello 实现Hello服务接口</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h helloService)</span> <span class="title">SayHello</span><span class="params">(ctx context.Context, in *pb.HelloRequest)</span> <span class="params">(*pb.HelloResponse, error)</span></span> &#123;</span><br><span class="line">    resp := <span class="built_in">new</span>(pb.HelloResponse)</span><br><span class="line">    resp.Message = fmt.Sprintf(<span class="string">&quot;Hello %s.&quot;</span>, in.Name)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> resp, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    listen, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, Address)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        grpclog.Fatalf(<span class="string">&quot;Failed to listen: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实例化grpc Server</span></span><br><span class="line">    s := grpc.NewServer()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注册HelloService</span></span><br><span class="line">    pb.RegisterHelloServer(s, HelloService)</span><br><span class="line"></span><br><span class="line">    grpclog.Println(<span class="string">&quot;Listen on &quot;</span> + Address)</span><br><span class="line">    s.Serve(listen)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>服务端引入编译后的<code>proto</code>包，定义一个空结构用于实现约定的接口，接口描述可以查看<code>hello.pb.go</code>文件中的<code>HelloServer</code>接口描述。实例化grpc Server并注册HelloService，开始提供服务。</p>
+<p>运行：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go run main.go</span><br><span class="line">Listen on 127.0.0.1:50052  //服务端已开启并监听50052端</span><br></pre></td></tr></table></figure>
+<p><strong>实现客户端调用 <code>client/main.go</code></strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    pb <span class="string">&quot;rpc-demo/proto/hello&quot;</span> <span class="comment">// 引入proto包</span></span><br><span class="line">    <span class="string">&quot;golang.org/x/net/context&quot;</span></span><br><span class="line">    <span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">    <span class="string">&quot;google.golang.org/grpc/grpclog&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    <span class="comment">// Address gRPC服务地址</span></span><br><span class="line">    Address = <span class="string">&quot;127.0.0.1:50052&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 连接</span></span><br><span class="line">    conn, err := grpc.Dial(Address, grpc.WithInsecure())</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        grpclog.Fatalln(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化客户端</span></span><br><span class="line">    c := pb.NewHelloClient(conn)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调用方法</span></span><br><span class="line">    req := &amp;pb.HelloRequest&#123;Name: <span class="string">&quot;gRPC&quot;</span>&#125;</span><br><span class="line">    res, err := c.SayHello(context.Background(), req)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        grpclog.Fatalln(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    grpclog.Println(res.Message)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>客户端初始化连接后直接调用<code>hello.pb.go</code>中实现的<code>SayHello</code>方法，即可向服务端发起请求，使用姿势就像调用本地方法一样。</p>
+<p>运行：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go run main.go</span><br><span class="line">Hello gRPC.    // 接收到服务端响应</span><br></pre></td></tr></table></figure>
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2022/03/29/vim-%E7%9A%84%E9%85%8D%E7%BD%AE/">prev</a>
+    
+
+    
+    <p>last update time 2022-05-06</p>
+    
+    
+        <a class="extend next post-next" href="/2021/03/16/Ruby-block-proc-%E5%92%8C-lambda/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>乱码数据的处理问题  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">乱码数据的处理问题</h1>
+<article class="post markdown-style">
+  <p>作为一个开发人员，遇见中文乱码问题是常有的事情， 但是 想要复原这些乱码数据的一致是一个让人头疼的问题<br>这里我总结了几个 可以判断乱码原始编码的几个方法<br><strong>比如 拿到一个乱码数据:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">temp = <span class="string">&#x27;楀钩镞惰鐪熷涔狅纴鍒昏嫤阍荤爷鎶?湳锛屾墡瀹炲伐浣滐纴瑙勮寖绠＄悊銆备汉镐寲镄勭鐞嗗哜镵氢简涓?镓规妧链骞诧纴寰楀埌浜嗗叏鍏徃锻桦伐镄勪俊璧栥?锻桦伐100%鍙傚姞鍖讳缭锛?5钖嶅憳宸弬锷犲煄淇濓纴澶栨潵锻桦伐鎻愪緵椋熷锛屾椂镞跺埢鍒讳互鍏变骇鍏氩憳镄勬爣鍑呜 閲忚嚜宸憋纴鍦濂戒紒涓氱殑钖屾椂锛屼负绀句细浜嬩笟鎹愯祫锷10涓囧厓锛屾崘璧犺传锲板憳宸灞炴不鐥?涓囧厓锛屽府锷传锲板鐢?.6涓囧厓锛屾崘璧犳枃鏋椾腑瀛绅链鸿澶?涓囧厓锛屾厛锽勬崘鐚?涓囧厓銆?/p&gt; 锻拰鍏村悓蹇楀浜嬩笟镓宪杩芥眰锛屽湪杩椤崄鍑犲勾浼佷笟鍙戝睍杩囩涓纴鍏呭垎鍙戞尌浜嗕竴涓叡浜厷锻樼殑鍏堥攱妯寖甯浣灭敤锛屽弹鍒颁简闀囨敛搴溿?甯傜骇涓荤閮桊镄勮褰帮纴绀句细钖勭晫镄勪竴镊村璇勶纴浠栧潥淇彧链変笉鏂彂灞曪&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>首先要判断字符串的原始编码,python 中的 chardet 可以判断文件的编码，当然如果文本被重新编码过了就不能够判断原来的编码了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> chardet</span><br><span class="line">data = <span class="built_in">open</span>(<span class="string">&#x27;文件&#x27;</span>, <span class="string">&#x27;rb&#x27;</span>)</span><br><span class="line">dicts = chardet.detect(data) </span><br><span class="line">dicts <span class="comment"># &#123;&#x27;encoding&#x27;: &#x27;utf-8&#x27;, &#x27;confidence&#x27;: 0.99, &#x27;language&#x27;: &#x27;&#x27;&#125;</span></span><br></pre></td></tr></table></figure>
+<p>不过根据经验来说，由于微软对于国内的操作系统使用的是gbk 编码的，可以尝试用gbk编码再使用utf-8再解码, 不过已经再编码过的文本，即便这么操作也很难完全恢复原来的文本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">temp.encode(<span class="string">&#x27;gbk&#x27;</span>).decode(<span class="string">&#x27;utf-8&#x27;</span>,<span class="string">&#x27;ignore&#x27;</span>)                                                                                                                                                               </span><br><span class="line"><span class="comment"># &#x27;平߶真习刻苦Իү?，扎实工作规范管理〱䌖Є理K?ع技干得到了全兏뷥Є信赖?뷥100%参加医?5薍员巏ɠ城保外来뷥提供食，时߶刻刻以共产벑Є标 量自己好企业的薌时，为社ϸ事业捐资10万元，捐赠贫ư员属治?万元，帮ɴư?.6万元，捐赠文林中?万元，慈B捐?万元?/p&gt; ͒兴同志事业追求，在額几年企业发展过充分发挥了一丅亅͘的先锋樌，嵯到镇府?市级主Є彰社ϸ薄界Є一评他坚俏不斏展&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>当然也可以尝试 gb2312，gb18030，big5 等等多种编码再解码</p>
+<p>ruby也有相应的方法</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span> <span class="string">&#x27;iconv&#x27;</span></span><br><span class="line">Iconv.iconv(<span class="string">&quot;gbk//IGNORE&quot;</span>,<span class="string">&quot;UTF-8//IGNORE&quot;</span>,temp)</span><br></pre></td></tr></table></figure>
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2021/02/14/Golang%E6%96%B0%E6%89%8B%E5%8F%AF%E8%83%BD%E4%BC%9A%E8%B8%A9%E7%9A%8458%E4%B8%AA%E5%9D%91/">prev</a>
+    
+
+    
+    <p>last update time 2022-05-06</p>
+    
+    
+        <a class="extend next post-next" href="/2021/01/08/pythonvirtualenv/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

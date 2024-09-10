@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>frp安装配置之内网穿透最佳方案  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">frp安装配置之内网穿透最佳方案</h1>
+<article class="post markdown-style">
+  <p>Frp是一款流行的跨平台开源免费内网穿透反向代理应用，支持 Windows、macOS与 Linux，支持 TCP、UDP 协议，支持http 和 https 协议，在公网服务器安装一个server端，内网服务器安装一个客户端，起到一个中转转发的作用，从而实现内网暴露到外网，实际就是一个反向代理转发器。</p>
+<h3 id="服务器端安装配置-Frp"><a href="#服务器端安装配置-Frp" class="headerlink" title="服务器端安装配置 Frp"></a>服务器端安装配置 Frp</h3><p>FRP 使用 Go 语言开发，可以支持 Windows、Linux、macOS、ARM 等多平台部署。FRP 安装非常容易，只需下载对应系统平台的软件包并解压就可用了。这里以 Linux 系统为例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> FRP_VERSION=0.41.0</span><br><span class="line">sudo mkdir -p /etc/frp</span><br><span class="line"><span class="built_in">cd</span> /etc/frp</span><br><span class="line">sudo wget <span class="string">&quot;https://github.com/fatedier/frp/releases/download/v<span class="variable">$&#123;FRP_VERSION&#125;</span>/frp_<span class="variable">$&#123;FRP_VERSION&#125;</span>_linux_amd64.tar.gz&quot;</span></span><br><span class="line">sudo tar xzvf frp_<span class="variable">$&#123;FRP_VERSION&#125;</span>_linux_amd64.tar.gz</span><br><span class="line">sudo mv frp_<span class="variable">$&#123;FRP_VERSION&#125;</span>_linux_amd64/* /etc/frp</span><br></pre></td></tr></table></figure>
+<p>截止写这篇文章为止，github上的最新版本是0.41.0，如果以后出了更新的版本只要改一下上面的版本号就行了，可以去<a target="_blank" rel="noopener" href="https://links.jianshu.com/go?to=https://github.com/fatedier/frp/">https://github.com/fatedier/frp/</a>查看最新版本信息。</p>
+<p>FRP 默认提供了 2 个服务端配置文件，一个是简化版的 frps.ini，另一个是完整版的 frps_full.ini。初学者只需用简版配置即可，在简版 frps.ini 配置文件里，默认设置了监听端口为 7000，可以按需修改它。</p>
+<p>需要将服务器的系统防火墙安全组放行，设置 <code>7000</code> 或修改过的对应端口的「允许入站和出站」，否则会一直连接不上的哦！！！这个切记！！</p>
+<h3 id="启动-FRP-服务端-非后台启动，未配置开机自启的情况下"><a href="#启动-FRP-服务端-非后台启动，未配置开机自启的情况下" class="headerlink" title="启动 FRP 服务端(非后台启动，未配置开机自启的情况下)"></a>启动 FRP 服务端(非后台启动，未配置开机自启的情况下)</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">./</span>frps <span class="operator">-</span>c <span class="operator">./</span>frps.ini</span><br></pre></td></tr></table></figure>
+<p>如服务器使用 Win 系统，假设解压到 c:\frp 文件夹，那么只需这样启动：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c:\frp\frps.exe <span class="operator">-</span>c c:\frp\frps.exe</span><br></pre></td></tr></table></figure>
+<p>当然，这样的启动一般测试可以，生产环境多数为后台启动，需要配置后台运行和开机自启</p>
+<h3 id="使用systemctl配置后台运行和开机自启"><a href="#使用systemctl配置后台运行和开机自启" class="headerlink" title="使用systemctl配置后台运行和开机自启"></a>使用systemctl配置后台运行和开机自启</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim &#x2F;lib&#x2F;systemd&#x2F;system&#x2F;frps.service</span><br></pre></td></tr></table></figure>
+<p>在frps.service里写入以下内容</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">Unit</span>]</span><br><span class="line">Description=fraps service</span><br><span class="line">After=network.target syslog.target</span><br><span class="line">Wants=network.target</span><br><span class="line"></span><br><span class="line">[<span class="meta">Service</span>]</span><br><span class="line">Type=simple</span><br><span class="line"><span class="meta">#启动服务的命令（此处写你的frps的实际安装目录）</span></span><br><span class="line">ExecStart=/etc/frp/frps -c /etc/frp/frps.ini</span><br><span class="line"></span><br><span class="line">[<span class="meta">Install</span>]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+<h3 id="启动frps"><a href="#启动frps" class="headerlink" title="启动frps"></a>启动frps</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start frps</span><br><span class="line"><span class="comment">#打开自启动</span></span><br><span class="line">sudo systemctl <span class="built_in">enable</span> frps</span><br></pre></td></tr></table></figure>
+<p>如果要重启应用，<code>sudo systemctl restart frps</code><br>如果要停止应用，<code>sudo systemctl stop frps</code><br>如果要查看应用的日志，<code>sudo systemctl status frps</code></p>
+<p>如果启动时7000端口被占用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看端口号 </span></span><br><span class="line">netstat -anp|grep 7000</span><br></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看端口号</span></span><br><span class="line">lsof -i:7000</span><br></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看程序进程 </span></span><br><span class="line">ps -ef|grep frps</span><br></pre></td></tr></table></figure>
+<p>得到进程id（pid）之后，杀掉进程</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">kill</span> -9 进程号</span><br></pre></td></tr></table></figure>
+<p>至此服务端安装完毕并已经启动</p>
+<h3 id="配置frp客户端（内网机器上）"><a href="#配置frp客户端（内网机器上）" class="headerlink" title="配置frp客户端（内网机器上）"></a>配置frp客户端（内网机器上）</h3><p>可以将 Frp 客户端安装在内网的 Windows 电脑、Linux 设备 比如树莓派 或者 NAS，甚至部分路由器等设备上。Linux 客户端的安装和启动与服务器端没有太多区别，只是对应运行程序是 frpc 而不是 frps。</p>
+<p>如果是linux设置，安装和设置重启过程这里就省略了，和上面一样的，如果是windows电脑，Frp 是绿色程序，下载软件包回来解压后，启动 frpc.exe 即可。</p>
+<p>在启动前，我们需要先修改配置文件frpc.ini<br>比如服务器的公网ip是1.2.3.4.5</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">common</span>]</span><br><span class="line">server_addr = <span class="number">1.2</span><span class="number">.3</span><span class="number">.4</span><span class="number">.5</span></span><br><span class="line">server_port = <span class="number">7000</span></span><br><span class="line"></span><br><span class="line">[<span class="meta">ssh</span>]</span><br><span class="line">type = tcp</span><br><span class="line">local_ip = <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span></span><br><span class="line">local_port = <span class="number">22</span></span><br><span class="line">remote_port = <span class="number">7001</span></span><br><span class="line"></span><br><span class="line">[<span class="meta">hexo</span>]</span><br><span class="line">type = tcp</span><br><span class="line">local_ip = <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span></span><br><span class="line">local_port = <span class="number">4000</span></span><br><span class="line">remote_port = <span class="number">7002</span></span><br></pre></td></tr></table></figure>
+<p>如上，中括号里面的文字是标识，可以自定义，第一个<code>server-port = 7000</code>是服务器上的server端端口。<br>这里配置了四个应用，分别是<br>1.ssh远程登录22端口，映射公网的7001；<br>2.hexo应用，4000端口映射公网的7002</p>
+<p>以上还可以配置更多端口，上面的7001到7002都要在服务器安全组放行</p>
+<h3 id="启动frp客户端"><a href="#启动frp客户端" class="headerlink" title="启动frp客户端"></a>启动frp客户端</h3><p>linux和上面写的服务端启动方法一样<br>windows假设已将 Frp 的客户端解压缩到 c:\frp 目录中，那么启动 Frp 客户端的命令就是：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c:\frp\frpc.exe <span class="operator">-</span>c c:\frp\frpc.ini</span><br></pre></td></tr></table></figure>
+<p>Linux 启动 Frp 客户端命令(非后台启动，未配置开机自启的情况下)：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">./</span>frpc <span class="operator">-</span>c <span class="operator">./</span>frpc.ini</span><br></pre></td></tr></table></figure>
+<p>启动之后看到 “start proxy success”字样就表示启动成功了。</p>
+<h3 id="远程访问"><a href="#远程访问" class="headerlink" title="远程访问"></a>远程访问</h3><p>公网ip或域名:7001就可以登录内网linux</p>
+<p>公网ip或域名:7002就可以访问到内网的hexo应用</p>
+<p>这样真的就完美舒服了。</p>
+
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2022/04/25/mac%E6%9F%A5%E7%9C%8B%E8%BF%9C%E7%A8%8B%E7%AB%AF%E5%8F%A3%E6%98%AF%E5%90%A6%E6%89%93%E5%BC%80/">prev</a>
+    
+
+    
+    <p>last update time 2022-05-06</p>
+    
+    
+        <a class="extend next post-next" href="/2022/03/29/vim-%E7%9A%84%E9%85%8D%E7%BD%AE/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

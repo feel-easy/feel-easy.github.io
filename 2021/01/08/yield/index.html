@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>yield 的基本使用  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">yield 的基本使用</h1>
+<article class="post markdown-style">
+  <p>所有的”方法（methods）”隐式跟上一个”块（block）”参数。</p>
+<p>块参数也可以明确给定，形式就是在参数前面加一个”&amp;”，比如 def fn(arg1, arg2, &amp;block) end，其中的 &amp;block 就是明确给定的块参数。</p>
+<p>块参数的动作，可以通过调用 call() 方法执行，还可以用 yield 来执行 —— yield 其实就是一个语法糖。</p>
+<p>所以以下几种写法常常是等价的：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#method receives an invisible block argument</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span></span></span><br><span class="line">    <span class="keyword">yield</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#specify it explicitly</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo2</span><span class="params">(&amp;block)</span></span></span><br><span class="line">    <span class="keyword">yield</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#yield is equal to block.call</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo3</span><span class="params">(&amp;block)</span></span></span><br><span class="line">    block.call(<span class="number">1</span>)    </span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#function call</span></span><br><span class="line">foo1 &#123;<span class="params">|x|</span> puts x&#125;    <span class="comment"># =&gt; 1</span></span><br><span class="line">foo2 &#123;<span class="params">|x|</span> puts x&#125;    <span class="comment"># =&gt; 1</span></span><br><span class="line">foo3 &#123;<span class="params">|x|</span> puts x&#125;    <span class="comment"># =&gt; 1</span></span><br></pre></td></tr></table></figure>
+<h2 id="Proc"><a href="#Proc" class="headerlink" title="Proc"></a>Proc</h2><p>前面说到所有方法都可以隐式或显式指定一个块参数，那么块参数到底是什么呢？</p>
+<p>答案是 Proc 对象，一个具有 call 方法的对象。</p>
+<p>Proc 对象的定义有几种形式：</p>
+<ul>
+<li>直接使用 {}</li>
+<li>使用 Proc.new {}</li>
+<li>使用 proc {}</li>
+<li>使用 lambda {}</li>
+</ul>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#yield is equal to block.call</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(&amp;block)</span></span></span><br><span class="line">    puts block.<span class="keyword">class</span></span><br><span class="line">    puts block.to_s</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">1</span>    </span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#function call</span></span><br><span class="line"><span class="comment"># Proc created using &#123;&#125; syntax</span></span><br><span class="line">foo &#123;<span class="params">|x|</span> puts x&#125;   </span><br><span class="line"><span class="comment"># =&gt; Proc</span></span><br><span class="line"><span class="comment"># =&gt; #&lt;Proc:0x00000000e0b140@(ruby):9&gt;</span></span><br><span class="line"><span class="comment"># =&gt; 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Proc created with the &quot;proc&quot; keyword. Note &amp; syntax when calling.</span></span><br><span class="line">my_proc = <span class="built_in">proc</span> &#123; <span class="params">|n|</span> puts n &#125;</span><br><span class="line">foo(&amp;my_proc)</span><br><span class="line"><span class="comment"># =&gt; Proc</span></span><br><span class="line"><span class="comment"># =&gt; #&lt;Proc:0x00000000e0b140@(ruby):12&gt;</span></span><br><span class="line"><span class="comment"># =&gt; 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Proc creates with Proc.new</span></span><br><span class="line">my_proc = Proc.new &#123; <span class="params">|n|</span> puts n &#125;</span><br><span class="line">foo(&amp;my_proc)    <span class="comment"># =&gt; 1</span></span><br><span class="line"><span class="comment"># =&gt; Proc</span></span><br><span class="line"><span class="comment"># =&gt; #&lt;Proc:0x00000000e0b140@(ruby):16&gt;</span></span><br><span class="line"><span class="comment"># =&gt; 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Proc created with the &quot;lambda&quot; keyword. Nearly same thing.</span></span><br><span class="line">my_proc = <span class="built_in">lambda</span> &#123; <span class="params">|n|</span> puts n &#125;</span><br><span class="line">foo(&amp;my_proc)</span><br><span class="line"><span class="comment"># =&gt; Proc</span></span><br><span class="line"><span class="comment"># =&gt; #&lt;Proc:0x00000000e0b140@(ruby):20 (lambda)&gt;</span></span><br><span class="line"><span class="comment"># =&gt; 1</span></span><br></pre></td></tr></table></figure>
+<h2 id="yield-self"><a href="#yield-self" class="headerlink" title="yield self"></a>yield self</h2><p>在一个对象中，self 表示是一个当前对象的引用。</p>
+<p>所以，常见的 yield self if block_given? 中的 self 就和其它地方使用 self 一样，没什么特殊的。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C1</span></span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(&amp;block)</span></span></span><br><span class="line">        puts block.<span class="keyword">class</span></span><br><span class="line">        puts block.to_s</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">self</span> <span class="keyword">if</span> block_given?</span><br><span class="line">        <span class="keyword">yield</span> <span class="string">&quot;AAAAAAAAA&quot;</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C2</span></span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(&amp;block)</span></span></span><br><span class="line">        puts block.<span class="keyword">class</span></span><br><span class="line">        puts block.to_s</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">self</span> <span class="keyword">if</span> block_given?</span><br><span class="line">        <span class="keyword">yield</span> <span class="string">&quot;BBBBBBBBB&quot;</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_s</span></span></span><br><span class="line">        <span class="string">&quot;XXXXXXXXXX&quot;</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">c1 = C1.new</span><br><span class="line">c1.foo  &#123;<span class="params">|x|</span> puts x&#125;</span><br><span class="line"><span class="comment"># =&gt; Proc</span></span><br><span class="line"><span class="comment"># =&gt; #&lt;Proc:0x00000001c84aa0@(ruby):23&gt;</span></span><br><span class="line"><span class="comment"># =&gt; #&lt;Context::C1:0x00000001c84af0&gt;</span></span><br><span class="line"><span class="comment"># =&gt; AAAAAAAAA</span></span><br><span class="line"></span><br><span class="line">c2 = C2.new</span><br><span class="line">c2.foo  &#123;<span class="params">|x|</span> puts x&#125;</span><br><span class="line"><span class="comment"># =&gt; Proc</span></span><br><span class="line"><span class="comment"># =&gt; #&lt;Proc:0x00000001c842f8@(ruby):26&gt;</span></span><br><span class="line"><span class="comment"># =&gt; XXXXXXXXXX</span></span><br><span class="line"><span class="comment"># =&gt; BBBBBBBBB</span></span><br></pre></td></tr></table></figure>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>method 定义中 &amp;block 参数必须在最后</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 正确示例</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(arg1, arg2, &amp;block)</span></span></span><br><span class="line">    puts block</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#function call</span></span><br><span class="line">block = <span class="built_in">proc</span> &#123;<span class="params">|x|</span> puts x&#125;</span><br><span class="line">foo( <span class="number">1</span>, <span class="number">2</span>, &amp;block)                   </span><br><span class="line"><span class="comment"># =&gt; #&lt;Proc:0x000000011f3aa0@(ruby):14&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#错误示例</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(arg1, &amp;block, arg2)</span></span>     <span class="comment"># =&gt; (ruby): syntax error</span></span><br><span class="line">    puts block</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>yield 相当于是 block.call() 方法的调用，所以参数个数也需要对应</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span></span></span><br><span class="line">    <span class="keyword">yield</span> <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>     <span class="comment"># 这里的 1 2 3 就是传递的参数</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#function call</span></span><br><span class="line">foo &#123;<span class="params">|x|</span> puts x&#125;        <span class="comment"># =&gt; 1</span></span><br><span class="line">foo &#123;<span class="params">|x,y,z|</span> puts z&#125;    <span class="comment"># =&gt; 3</span></span><br><span class="line">foo &#123;<span class="params">|x,y,z,k|</span> puts k&#125;  <span class="comment"># 为空</span></span><br></pre></td></tr></table></figure>
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2021/01/08/FactoryBot%20%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93/">prev</a>
+    
+
+    
+    <p>last update time 2022-05-06</p>
+    
+    
+        <a class="extend next post-next" href="/2021/01/07/new-blog/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

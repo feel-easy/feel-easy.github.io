@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>FactoryBot 使用总结  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">FactoryBot 使用总结</h1>
+<article class="post markdown-style">
+  <p>1、四种创建方法</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回对象 但是不保存</span></span><br><span class="line">user = build(<span class="symbol">:user</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 返回对象并且保存</span></span><br><span class="line">user = create(<span class="symbol">:user</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 返回可用于构建用户实例的属性 HASH</span></span><br><span class="line">attrs = attributes_for(<span class="symbol">:user</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 返回一个对象，该对象的所有定义属性都已存根</span></span><br><span class="line">stub = build_stubbed(<span class="symbol">:user</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将一个块传递给上面的任何方法都将产生返回对象</span></span><br><span class="line">create(<span class="symbol">:user</span>) <span class="keyword">do</span> <span class="params">|user|</span></span><br><span class="line">  user.posts.create(attributes_for(<span class="symbol">:post</span>))</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>2、覆盖属性</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Build a User instance and override the first_name property</span></span><br><span class="line">user = build(<span class="symbol">:user</span>, <span class="symbol">first_name:</span> <span class="string">&quot;Joe&quot;</span>)</span><br><span class="line">user.first_name</span><br><span class="line"><span class="comment"># =&gt; &quot;Joe&quot;</span></span><br></pre></td></tr></table></figure>
+<p>3、重命名</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">factory <span class="symbol">:user</span>, <span class="symbol">aliases:</span> [<span class="symbol">:author</span>, <span class="symbol">:commenter</span>] <span class="keyword">do</span></span><br><span class="line">  first_name &#123; <span class="string">&quot;John&quot;</span> &#125;</span><br><span class="line">  last_name &#123; <span class="string">&quot;Doe&quot;</span> &#125;</span><br><span class="line">  date_of_birth &#123; <span class="number">18</span>.years.ago &#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">factory <span class="symbol">:post</span> <span class="keyword">do</span></span><br><span class="line">  author</span><br><span class="line">  <span class="comment"># instead of</span></span><br><span class="line">  <span class="comment"># association :author, factory: :user</span></span><br><span class="line">  title &#123; <span class="string">&quot;How to read a book effectively&quot;</span> &#125;</span><br><span class="line">  body &#123; <span class="string">&quot;There are five steps involved.&quot;</span> &#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">factory <span class="symbol">:comment</span> <span class="keyword">do</span></span><br><span class="line">  commenter</span><br><span class="line">  <span class="comment"># instead of</span></span><br><span class="line">  <span class="comment"># association :commenter, factory: :user</span></span><br><span class="line">  body &#123; <span class="string">&quot;Great article!&quot;</span> &#125;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>4、属性依赖</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">factory <span class="symbol">:user</span> <span class="keyword">do</span></span><br><span class="line">  first_name &#123; <span class="string">&quot;Joe&quot;</span> &#125;</span><br><span class="line">  last_name  &#123; <span class="string">&quot;Blow&quot;</span> &#125;</span><br><span class="line">  email &#123; <span class="string">&quot;<span class="subst">#&#123;first_name&#125;</span>.<span class="subst">#&#123;last_name&#125;</span>@example.com&quot;</span>.downcase &#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">create(<span class="symbol">:user</span>, <span class="symbol">last_name:</span> <span class="string">&quot;Doe&quot;</span>).email</span><br><span class="line"><span class="comment"># =&gt; &quot;joe.doe<span class="doctag">@example</span>.com&quot;</span></span><br></pre></td></tr></table></figure>
+<p>5、通过嵌套工厂，您可以轻松地为同一个类创建多个工厂，而无需重复常见的属性:</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">factory <span class="symbol">:post</span> <span class="keyword">do</span></span><br><span class="line">  title &#123; <span class="string">&quot;A title&quot;</span> &#125;</span><br><span class="line"></span><br><span class="line">  factory <span class="symbol">:approved_post</span> <span class="keyword">do</span></span><br><span class="line">    approved &#123; <span class="literal">true</span> &#125;</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">approved_post = create(<span class="symbol">:approved_post</span>)</span><br><span class="line">approved_post.title    <span class="comment"># =&gt; &quot;A title&quot;</span></span><br><span class="line">approved_post.approved <span class="comment"># =&gt; true</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">factory <span class="symbol">:post</span> <span class="keyword">do</span></span><br><span class="line">  title &#123; <span class="string">&quot;A title&quot;</span> &#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">factory <span class="symbol">:approved_post</span>, <span class="symbol">parent:</span> <span class="symbol">:post</span> <span class="keyword">do</span></span><br><span class="line">  approved &#123; <span class="literal">true</span> &#125;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>6、在factory_bot 5中，关联默认使用与其父对象相同的构建策略:</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">FactoryBot.define <span class="keyword">do</span></span><br><span class="line">  factory <span class="symbol">:author</span></span><br><span class="line"></span><br><span class="line">  factory <span class="symbol">:post</span> <span class="keyword">do</span></span><br><span class="line">    author</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">post = build(<span class="symbol">:post</span>)</span><br><span class="line">post.new_record?        <span class="comment"># =&gt; true</span></span><br><span class="line">post.author.new_record? <span class="comment"># =&gt; true</span></span><br><span class="line"></span><br><span class="line">post = create(<span class="symbol">:post</span>)</span><br><span class="line">post.new_record?        <span class="comment"># =&gt; false</span></span><br><span class="line">post.author.new_record? <span class="comment"># =&gt; false</span></span><br></pre></td></tr></table></figure>
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2021/01/08/pythonvirtualenv/">prev</a>
+    
+
+    
+    <p>last update time 2022-05-06</p>
+    
+    
+        <a class="extend next post-next" href="/2021/01/08/yield/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

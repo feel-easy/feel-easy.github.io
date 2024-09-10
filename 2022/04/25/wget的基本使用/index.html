@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>wget的基本使用  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">wget的基本使用</h1>
+<article class="post markdown-style">
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">需要下载某个目录下面的所有文件。</span><br><span class="line">命令如下</span><br><span class="line">wget -c -r -np -k -L -p  http://docs.openstack.org/liberty/install-guide-rdo/</span><br><span class="line"></span><br><span class="line">在下载时。有用到外部域名的图片或连接。如果需要同时下载就要用-H参数。</span><br><span class="line">wget -np -nH -r –span-hosts www.xianren.org/pub/path/</span><br><span class="line">-c 断点续传</span><br><span class="line">-r 递归下载，下载指定网页某一目录下（包括子目录）的所有文件</span><br><span class="line">-nd 递归下载时不创建一层一层的目录，把所有的文件下载到当前目录</span><br><span class="line">-np 递归下载时不搜索上层目录，如wget -c -r www.xianren.org/pub/path/</span><br><span class="line">没有加参数-np，就会同时下载path的上一级目录pub下的其它文件</span><br><span class="line">-k 将绝对链接转为相对链接，下载整个站点后脱机浏览网页，最好加上这个参数</span><br><span class="line">-L 递归时不进入其它主机，如wget -c -r www.xianren.org/</span><br><span class="line">如果网站内有一个这样的链接：</span><br><span class="line">www.xianren.org，不加参数-L，就会像大火烧山一样，会递归下载www.xianren.org网站</span><br><span class="line">-p 下载网页所需的所有文件，如图片等</span><br><span class="line">-A 指定要下载的文件样式列表，多个样式用逗号分隔</span><br><span class="line">-i 后面跟一个文件，文件内指明要下载的URL</span><br></pre></td></tr></table></figure>
+
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2022/05/07/golang-migrate-%E4%BD%BF%E7%94%A8/">prev</a>
+    
+
+    
+    <p>last update time 2022-05-06</p>
+    
+    
+        <a class="extend next post-next" href="/2022/04/25/mac%E6%9F%A5%E7%9C%8B%E8%BF%9C%E7%A8%8B%E7%AB%AF%E5%8F%A3%E6%98%AF%E5%90%A6%E6%89%93%E5%BC%80/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>docker 安装gitea  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">docker 安装gitea</h1>
+<article class="post markdown-style">
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">version: &quot;3&quot;</span><br><span class="line"></span><br><span class="line">networks:</span><br><span class="line">  gitea:</span><br><span class="line">    external: false</span><br><span class="line">services:</span><br><span class="line">  server:</span><br><span class="line">    image: gitea&#x2F;gitea:latest</span><br><span class="line">    container_name: gitea</span><br><span class="line">    environment:</span><br><span class="line">      - USER_UID&#x3D;1000</span><br><span class="line">      - USER_GID&#x3D;1000</span><br><span class="line">      - DB_TYPE&#x3D;mysql</span><br><span class="line">      - DB_HOST&#x3D;db:3306</span><br><span class="line">      - DB_NAME&#x3D;gitea</span><br><span class="line">      - DB_USER&#x3D;gitea</span><br><span class="line">      - DB_PASSWD&#x3D;gitea</span><br><span class="line">    restart: always</span><br><span class="line">    networks:</span><br><span class="line">      - gitea</span><br><span class="line">    volumes:</span><br><span class="line">      - .&#x2F;data:&#x2F;data</span><br><span class="line">      - &#x2F;etc&#x2F;timezone:&#x2F;etc&#x2F;timezone:ro</span><br><span class="line">      - &#x2F;etc&#x2F;localtime:&#x2F;etc&#x2F;localtime:ro</span><br><span class="line">    ports:</span><br><span class="line">      - &quot;222:22&quot;</span><br><span class="line">    depends_on:</span><br><span class="line">      - db</span><br><span class="line"></span><br><span class="line">  db:</span><br><span class="line">    image: mysql:8</span><br><span class="line">    restart: always</span><br><span class="line">    environment:</span><br><span class="line">      - MYSQL_ROOT_PASSWORD&#x3D;gitea</span><br><span class="line">      - MYSQL_USER&#x3D;gitea</span><br><span class="line">      - MYSQL_PASSWORD&#x3D;gitea</span><br><span class="line">      - MYSQL_DATABASE&#x3D;gitea</span><br><span class="line">    networks:</span><br><span class="line">      - gitea</span><br><span class="line">    volumes:</span><br><span class="line">      - .&#x2F;mysql:&#x2F;var&#x2F;lib&#x2F;mysql</span><br><span class="line">  </span><br><span class="line">  nginx:</span><br><span class="line">    image: nginx:latest</span><br><span class="line">    container_name: nginx-web</span><br><span class="line">    restart: always</span><br><span class="line">    ports:</span><br><span class="line">      - 80:80</span><br><span class="line">      - 443:443</span><br><span class="line">    networks:</span><br><span class="line">      - gitea</span><br><span class="line">    volumes:</span><br><span class="line">      - .&#x2F;nginx&#x2F;cert:&#x2F;etc&#x2F;nginx&#x2F;cert</span><br><span class="line">      - .&#x2F;nginx&#x2F;nginx.conf:&#x2F;etc&#x2F;nginx&#x2F;conf.d&#x2F;default.conf</span><br><span class="line">      - .&#x2F;nginx&#x2F;log:&#x2F;var&#x2F;log&#x2F;nginx</span><br><span class="line">      - &#x2F;etc&#x2F;localtime:&#x2F;etc&#x2F;localtime:ro</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">client_max_body_size 100m;</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    listen 443 ssl;</span><br><span class="line">    server_name git.shenglei.top;</span><br><span class="line">    ssl_certificate &#x2F;etc&#x2F;nginx&#x2F;cert&#x2F;www.shenglei.top_bundle.crt;</span><br><span class="line">    ssl_certificate_key &#x2F;etc&#x2F;nginx&#x2F;cert&#x2F;www.shenglei.top.key;</span><br><span class="line">    ssl_session_timeout 5m;</span><br><span class="line">    ssl_protocols TLSv1.2 TLSv1.3;</span><br><span class="line">    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;</span><br><span class="line">    ssl_prefer_server_ciphers on;</span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        proxy_pass http:&#x2F;&#x2F;gitea:3000;</span><br><span class="line">        proxy_set_header Host $host;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">        proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ssl_certificate &#x2F;etc&#x2F;nginx&#x2F;cert&#x2F;www.shenglei.top_bundle.crt;</span><br><span class="line">ssl_certificate_key &#x2F;etc&#x2F;nginx&#x2F;cert&#x2F;www.shenglei.top.key;</span><br><span class="line">ssl_session_timeout 5m;</span><br><span class="line">ssl_protocols TLSv1.2 TLSv1.3;</span><br><span class="line">ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;</span><br><span class="line">ssl_prefer_server_ciphers on;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">version: &quot;3&quot;</span><br><span class="line"></span><br><span class="line">networks:</span><br><span class="line">  tinode-net:</span><br><span class="line">    external: false</span><br><span class="line">services:</span><br><span class="line">  server:</span><br><span class="line">    image: tinode&#x2F;tinode-mysql:latest</span><br><span class="line">    container_name: tinode</span><br><span class="line">    environment:</span><br><span class="line">      - EXT_CONFIG&#x3D;&#x2F;tinode.conf </span><br><span class="line">    restart: always</span><br><span class="line">    networks:</span><br><span class="line">      - tinode-net</span><br><span class="line">    volumes:</span><br><span class="line">      - .&#x2F;tinode.conf:&#x2F;tinode.conf</span><br><span class="line">      - &#x2F;etc&#x2F;timezone:&#x2F;etc&#x2F;timezone:ro</span><br><span class="line">      - &#x2F;etc&#x2F;localtime:&#x2F;etc&#x2F;localtime:ro</span><br><span class="line">    depends_on:</span><br><span class="line">      - mysql</span><br><span class="line">  mysql:</span><br><span class="line">    image: mysql:5.7</span><br><span class="line">    restart: always</span><br><span class="line">    environment:</span><br><span class="line">      - MYSQL_ALLOW_EMPTY_PASSWORD&#x3D;yes</span><br><span class="line">    networks:</span><br><span class="line">      - tinode-net</span><br><span class="line">    volumes:</span><br><span class="line">      - .&#x2F;mysql:&#x2F;var&#x2F;lib&#x2F;mysql</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2022/05/20/golang%E7%BB%93%E6%9E%84%E4%BD%93%E6%A0%87%E7%AD%BE/">prev</a>
+    
+
+    
+    <p>last update time 2023-06-06</p>
+    
+    
+        <a class="extend next post-next" href="/2022/05/07/golang-migrate-%E4%BD%BF%E7%94%A8/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

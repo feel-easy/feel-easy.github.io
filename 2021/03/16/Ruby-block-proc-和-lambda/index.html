@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>Ruby block, proc 和 lambda  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">Ruby block, proc 和 lambda</h1>
+<article class="post markdown-style">
+  <p>做为热身，从一些简单的例子开始,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">def f1</span><br><span class="line">  yield</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f2(&amp;p)</span><br><span class="line">  p.call</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f3(p)</span><br><span class="line">  p.call</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f1 &#123; puts &quot;f1&quot; &#125;</span><br><span class="line"></span><br><span class="line">f2 &#123; puts &quot;f2&quot; &#125;</span><br><span class="line"></span><br><span class="line">f3(proc&#123; puts &quot;f3&quot;&#125;)</span><br><span class="line"></span><br><span class="line">f3(Proc.new&#123;puts &quot;f3&quot;&#125;)</span><br><span class="line"></span><br><span class="line">f3(lambda&#123;puts &quot;f3&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<p>若你用的是 ruby1.9 及以上的版本，还可以这样,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f3(-&gt; &#123;puts &quot;f3&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<p>上面是 block, proc 和 lambda 的一些基本用法。</p>
+<h3 id="block"><a href="#block" class="headerlink" title="block"></a>block</h3><p>先说说 block, ruby 中的 block 是方法的一个重要但非必要的组成部分，们可以认为方法的完整定义类似于，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def f(零个或多个参数, &amp;p)</span><br><span class="line">  ...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>注意&amp;p 不是参数，&amp;p 类似于一种声明，当方法后面有 block 时，会将 block 捕捉起来存放到变量 p 中，如果方法后面没有 block，那么&amp;p 什么也不干。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def f(&amp;p)</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f(1)  #&#x3D;&gt; 会抛出ArgumentError: wrong number of arguments (1 for 0)异常</span><br><span class="line"></span><br><span class="line">f()  #&#x3D;&gt; 没有异常抛出</span><br><span class="line"></span><br><span class="line">f() &#123; puts &quot;f&quot;&#125; #&#x3D;&gt; 没有异常抛出</span><br></pre></td></tr></table></figure>
+<p>从上面代码的运行结果可以知道&amp;p 不是参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def f(a)</span><br><span class="line">  puts a</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f(1) &#123; puts 2&#125;  #&#x3D;&gt; 没有异常抛出，输出1</span><br></pre></td></tr></table></figure>
+<p>所以任何方法后面都可以挂载一个 block，如果你定义的方法想使用 block 做点事情，那么你需要使用 yield 关键字或者&amp;p</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def f1</span><br><span class="line">  yield</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f2(&amp;p)</span><br><span class="line">  p.call</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>此时 f1, f2 执行时后面必须挂一个 block，否则会抛出异常，f1 抛出 LocalJumpError: no block given (yield) 的异常,f2 抛出 NoMethodError: undefined method ‘call’ for nil:NilClass 的异常, ruby 提供了<code>block_given?</code>方法来判断方法后面是否挂了 block，于是们可以这样修改 f1 和 f2，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def f1</span><br><span class="line"> yield if block_given?</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f2(&amp;p)</span><br><span class="line">  p.call if block_given?</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>这样的话,f1 和 f2 后面无论挂不挂 block 都不会抛异常了。 们再来看看 f2 修改前抛出的 NoMethodError: undefined method ‘call’ for nil:NilClass 异常，这种说明当 f2 后面没有挂 block 的时候 p 是 nil，那么们给 f2 挂个 block，再打印出 p，看看 p 究竟是什么，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def f2(&amp;p)</span><br><span class="line">  puts p.class</span><br><span class="line">  puts p.inspect</span><br><span class="line">  p.call</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f2 &#123;&#125; # 输出Proc和类似&lt;Proc:0x007fdc72829780@(irb):21&gt;</span><br></pre></td></tr></table></figure>
+<p>这说明 p 是一个 Proc 实例对象，在 ruby 中，&amp;还可以这么用，<code>[1,2] &amp; [2,3]</code> 或者 <code>puts true if 1 &amp;&amp; 1</code> 或者在某个类中将它作为一个方法名。</p>
+<p>很多 ruby 老鸟会写类似下面的代码,</p>
+<p><code>[&quot;1&quot;, &quot;2&quot;, &quot;3&quot;].map(&amp;:to_i)</code>，其效果和<code>[&quot;1&quot;, &quot;2&quot;, &quot;3&quot;].map &#123;|i| i.to_i &#125;</code>一样, 但简洁了许多，并且更加拉风。 这里的魔法在于符号&amp;会触发:to_i 的 to_proc 方法, to_proc 执行后会返回一个 proc 实例， 然后&amp;会把这个 proc 实例转换成一个 block,们需要要明白 map 方法后挂的是一个 block，而不是接收一个 proc 对象做为参数。&amp;:to_i 是一个 block，block 不能独立存在，同时你也没有办法直接存储或传递它，必须把 block 挂在某个方法后面。</p>
+<p>:to_i 是 <strong>Symbol</strong> 类的实例, <strong>Symbol</strong> 中的 to_proc 方法的实现类似于，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class Symbol</span><br><span class="line"></span><br><span class="line">  def to_proc</span><br><span class="line">    Proc.new &#123;|obj| obj.send(self) &#125;</span><br><span class="line">  end</span><br><span class="line"></span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>同理们可以给自己写的类定义 to_proc 方法,然后使用&amp;耍下酷，比如，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class AddBy</span><br><span class="line"></span><br><span class="line">  def initialize(num &#x3D; 0)</span><br><span class="line">    @num &#x3D; num</span><br><span class="line">  end</span><br><span class="line"></span><br><span class="line">  def to_proc</span><br><span class="line">    Proc.new &#123;|obj| obj.send(&#39;+&#39;, @num)&#125;</span><br><span class="line">  end</span><br><span class="line"></span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">add_by_9 &#x3D; AddBy.new(9)</span><br><span class="line">puts [1,2,3].map(&amp;add_by_9) #输出 [10, 11, 12]</span><br></pre></td></tr></table></figure>
+<p>在 ruby 中, block 有形,它有时候是这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">do |...|</span><br><span class="line">  ...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>有时候是这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;|...| ...&#125;</span><br></pre></td></tr></table></figure>
+<p>或者类似 &amp;p, &amp;:to_i, &amp;add_by_9 之类，但是它无体，无体的意思就是说 block 无法单独存在，必须挂在方法后面，并且你没有办法直接把它存到变量里，也没有办法直接将它作为参数传递给方法，所以当你想存储，传递 block 时，你可以使用 proc 对象了，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"> p &#x3D; Proc.new(&amp;:to_i)</span><br><span class="line"> p &#x3D; Proc.new &#123;|obj| obj.to_i &#125; </span><br><span class="line"> p &#x3D; Proc.new do |obj|</span><br><span class="line">   obj.to_i</span><br><span class="line"> end</span><br><span class="line"> p &#x3D; proc(&amp;:to_i)</span><br><span class="line"> p &#x3D; proc &#123;|obj| obj.to_i&#125;</span><br><span class="line"> p &#x3D; proc do |obj|</span><br><span class="line">   obj.to_i</span><br><span class="line"> end</span><br><span class="line"></span><br><span class="line">def make_proc(&amp;p)</span><br><span class="line">  p</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">p &#x3D; make_proc(&amp;:to_i)</span><br><span class="line">p &#x3D; make_proc do |obj|</span><br><span class="line">  obj.to_i</span><br><span class="line">end</span><br><span class="line">p &#x3D; make_proc &#123;|obj| obj.to_i &#125;</span><br></pre></td></tr></table></figure>
+<p>虽然在开发中经常用到 block，但是很少显式地去使用 Proc 或 proc 去实例化 block，比如几乎没有写过这样的代码,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">f(Proc.new &#123;|...| ...&#125;)</span><br><span class="line"></span><br><span class="line">f(proc &#123;|...| ...&#125;)</span><br><span class="line"></span><br><span class="line">p &#x3D;  Proc.new &#123;|...| ...&#125; #然后在某个地方p.call(...)或者将p传递给某个方法，比如f(p)</span><br></pre></td></tr></table></figure>
+<p>在使用 block 时，会忽略 proc 的存在，将 proc 定位为一个幕后的工作者。经常写类似下面的代码，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">def f(...)</span><br><span class="line">  ...</span><br><span class="line">  yield</span><br><span class="line">  ...</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f(..., &amp;p)</span><br><span class="line">  ...</span><br><span class="line">  p.call</span><br><span class="line">  ...</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f(..., &amp;p)</span><br><span class="line">  instance_eval &amp;p</span><br><span class="line">  ...</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f(..., &amp;p)</span><br><span class="line">  ...</span><br><span class="line">  defime_method m, &amp;p</span><br><span class="line">  ...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>有些新手会写类似下面的一执行就会报错的代码,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def f(..., &amp;p)</span><br><span class="line">  instance_eval p</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f(..., p)</span><br><span class="line">  instance_eval p.call</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>也有这样写的,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def f(..., &amp;p)</span><br><span class="line">  instance_eval do</span><br><span class="line">    p.call</span><br><span class="line">  end</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def f(...)</span><br><span class="line">  instance_eval do</span><br><span class="line">    yield</span><br><span class="line">  end</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>甚至写过类似下面的代码，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def f(...)</span><br><span class="line">  instance_eval yield</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>我们经常在该挂 block 的时候，却把 proc 对象当参数传给方法了， 或者不明白&amp;p 就是 block 可以直接交给方法使用，曾经也犯过这样的错误就是因为没有把 block 和 proc 正确的区分开来, <strong>&amp;p 是 block, p 是 proc，不到万不得已的情况下不要显式地创建 proc</strong>，每当对 block 和 proc 之间的关系犯糊涂时，就会念上几句。</p>
+<p>再来聊聊 yield 和&amp;p，我们经常这样定义方法，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def f(...)</span><br><span class="line">  yield(...)</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f(..., &amp;p)</span><br><span class="line">  p.call(...)</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>yield 和 call 后面都可以接参数，如果你是这样定义方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def f(...)</span><br><span class="line">  yield 1, 2</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>那么可以这样执行代码,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">f(...) do |i, j|</span><br><span class="line">  puts i</span><br><span class="line">  puts j</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>但是这样做也不会有错,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f(...) do</span><br><span class="line">  ...</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>p.call(…) 的情况类似, 也就是说 block 和 proc 都不检查参数 (其实通过 proc 方法创建的 proc 在 1.8 是严格检查参数的，但是在 1.9 及以上的版本是不检查参数的)，为什么 block 和 proc 不检查参数呢?其实这个很好理解，因为在实际应用中你可能需要在一个方法中多次调用 block 或者 proc 并且给的参数个数不一样，比如,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">def f()</span><br><span class="line">  yield 0</span><br><span class="line">  yield 1, 2</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def ff(&amp;p)</span><br><span class="line">  p.call 0</span><br><span class="line">  p.call 1, 2, 3</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">ff do |a1, a2, a3|</span><br><span class="line">  puts a1   </span><br><span class="line">  puts a2</span><br><span class="line">   puts a3</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>由于方法后面只能挂一个 block，所以要实现上面的代码功能，就不能去严格检查参数了。</p>
+<p>转入正题，这两种方式效果差不多，都能很好地利用 block。使用 yield，看起来简洁，使用&amp;p，看起来直观，并且你可以将&amp;p 传给其他方法使用。 但是在 <strong>ruby1.8</strong> 的版本你不应像下面这样做,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def f1(...)</span><br><span class="line">  eval(&quot;yield&quot;)</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>可以,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def f2(..., &amp;p)</span><br><span class="line">  eval(&quot;p.call&quot;)</span><br><span class="line">end</span><br><span class="line">f1(...) &#123;&#125;  # 会抛异常</span><br><span class="line">f2(...) &#123;&#125;  # 正常运行</span><br></pre></td></tr></table></figure>
+<p>当然上面这种用法很少见，但是却被碰到了，经常写一些方法去请求外部的 api，有时这些外部的 api 不是特别稳定，时不时会遇到一些 bad respoense, timeout 错误，针对这些错误，应该立即重发报文重试，对于其他异常就直接抛异常。于是写了一个 try 方法来满足这个需求，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">  def try(title, options &#x3D; &#123; &#125;, &amp;p)</span><br><span class="line">    ee &#x3D; &#39;#&#123;e&#125;&#39;</span><br><span class="line">    tried_times &#x3D; 0</span><br><span class="line">    max_times &#x3D; options[:max_times] || 3</span><br><span class="line">    exceptions &#x3D; options[:on] || Exception</span><br><span class="line">    exceptions &#x3D; [exceptions] if !exceptions.is_a?(Array)</span><br><span class="line">    rescue_text &#x3D; &lt;&lt;-EOF</span><br><span class="line">      begin</span><br><span class="line">        p.call</span><br><span class="line">      rescue #&#123;exceptions.join(&#39;,&#39;)&#125; &#x3D;&gt; e</span><br><span class="line">        Rails.logger.info(&quot;#&#123;title&#125;发生异常#&#123;ee&#125;&quot;)</span><br><span class="line">        if (tried_times +&#x3D; 1) &lt; max_times</span><br><span class="line">          Rails.logger.info(&quot;开始重试#&#123;title&#125;--第#&#123;tried_times&#125;次重试&quot;)</span><br><span class="line">          retry </span><br><span class="line">        end</span><br><span class="line">        raise e</span><br><span class="line">      end</span><br><span class="line">    EOF</span><br><span class="line">    eval rescue_text</span><br><span class="line">  end</span><br><span class="line"></span><br><span class="line">try(&#39;某某api&#39;, :max_times &#x3D;&gt; 2, :on &#x3D;&gt; [Net::HTTPBadResponse, Timeout::Error]) do</span><br><span class="line">  open(api_url)</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>最开始用的是 yield，结果在 <strong>ree</strong> 下执行 try 方法时会报错，后来改成使用&amp;p 就通过了。</p>
+<p>通过试验发现在 <strong>ruby1.9</strong> 及以上版本已经没有这种差异了。</p>
+<p>做个小结, <strong>block 和 proc 是两种不同的东西, block 有形无体，proc 可以将 block 实体化, 可以把&amp;p 看做一种运算，其中&amp;触发 p 的 to_proc 方法，然后&amp;会将 to_proc 方法返回的 proc 对象转换成 block</strong> 。</p>
+<p>其中 proc 对象的 to_proc 方法返回自身。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p &#x3D; proc &#123;&#125;</span><br><span class="line">p.equal? p.to_proc  # 返回true</span><br></pre></td></tr></table></figure>
+<h3 id="lambda"><a href="#lambda" class="headerlink" title="lambda"></a>lambda</h3><p>lambda 是匿名方法, lambda 和 proc 也是两种不同的东西，但是在 ruby 中 lambda 只能依附 proc 而存在，这点和 block 不同，block 并不依赖 proc。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">l &#x3D; lambda &#123;&#125;</span><br><span class="line">puts l.class </span><br></pre></td></tr></table></figure>
+<p>在 <strong>ruby1.8</strong> 中输出的信息类似 #Proc:0x0000000000000000@irb):1( 在 <strong>ruby1.9</strong> 及以上版本输出的信息类似 #Proc:0x007f85548109d0@irb):1lambda)(，注意 <strong>1.9</strong> 及以上版本的输出多了 <strong>(lambda)**，从这里可以理解 ruby 的设计者们确实在有意的区分 lambda 和 proc，并不想把 lambda 和 proc 混在一起,如同 ruby 中没有叫 Block 的类，除非你自己定义一个，ruby 中也没有叫 Lambda 的类，于是将 lambda 对象化的活儿就交给了 Proc，于是令人头大的情况出现了，当你用 lambda 弄出了一个匿名方法时，发现它是一个 proc 对象，并且这个匿名方法能干的活，proc 对象都能做，于是们这些码农不淡定了，<code>Proc.new &#123;&#125;</code>这样可以, <code>proc &#123;&#125;</code>这样也没有问题, <code>lambda &#123;&#125;</code>这样做也不错, <code>-&gt;&#123;&#125;</code>这个还是能行，平时吃个饭都为吃什么左右为难，现在一下子多出了四种差不多的方案来实现同一件事情，确实让人不好选择，特别是有些码农还有点小洁癖，如果在代码里一会儿看到<code>proc&#123;&#125;</code>, 一会儿看到<code>lambda&#123;&#125;</code>,这多不整洁啊，让人心情不畅快。在这里们认定 lambda 或者 -&gt; 弄出的就是一个匿名方法，记做 **l</strong>, 即使它披着 proc 的外衣，proc 或者 Proc.new 创建的就是一个 proc 对象,记做 <strong>p</strong> 在 ruby 各个版本中, <strong>l</strong> 和 <strong>p</strong> 是有一些差别的。</p>
+<p>定义一些方法，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">def f0()</span><br><span class="line">  p &#x3D; Proc.new &#123;return 0&#125;</span><br><span class="line">  p.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f1()</span><br><span class="line">  p &#x3D; proc &#123; return 0 &#125;</span><br><span class="line">  p.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f2()</span><br><span class="line">  l &#x3D; lambda &#123; return 0&#125;</span><br><span class="line">  l.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f3(p)</span><br><span class="line">  instance_eval &amp;p</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">class A</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f4(p)</span><br><span class="line">  A.class_eval &amp;p</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">p1 &#x3D; Proc.new &#123; &#125;</span><br><span class="line">p2 &#x3D; proc &#123;&#125;</span><br><span class="line">l  &#x3D; lambda &#123;&#125;</span><br><span class="line"></span><br><span class="line">def f5()</span><br><span class="line">  yield 1, 2</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f5 &#123;&#125;</span><br><span class="line">f5 &#123;|i|&#125;</span><br><span class="line">f5 &#123;|i,j|&#125;</span><br><span class="line">f5 &#123;|i,j,k|&#125;</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://l.ruby-china.com/photo/891b1782bb0db9593b4efda25e2e948e.png"><img src="https://l.ruby-china.com/photo/891b1782bb0db9593b4efda25e2e948e.png" alt="img"></a></p>
+<p>lambda 和 proc 之间的区别除了那个经常用做面试题目的经典的 return 之外，还有一个区别就是 lambda 不能完美的转换为 block(这点可以通过 f3 和 f4 执行的过程得证)，而 proc 可以完美的转换为 block,注意，说的 lambda 指的是用 lambda 方法或者-&gt;符号生成的 proc，当然和方法一样 lambda 是严格检查参数的，这个特点也和 proc 不一样。</p>
+<p>从上面的数据对比来看，在 1.8 版本，lambda 和 proc 方法生成的 proc 对象的行为是一致的，但在 1.9 以上和 jruby 的版本中,lambda 和 proc 的不同处增多，可以认为 ruby 的设计者们并不想把 lambda 和 proc 混同为一件事物。如前面所讲，proc 的主要作用是对象化 block 和 lambda，并且 proc 在行为上更接近于 block。</p>
+<h3 id="retrun-的几个试验"><a href="#retrun-的几个试验" class="headerlink" title="retrun 的几个试验"></a>retrun 的几个试验</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def f0()</span><br><span class="line">  p &#x3D; Proc.new &#123; return 0&#125;</span><br><span class="line">  p.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f1()</span><br><span class="line">  l &#x3D; lambda &#123; return 0&#125;</span><br><span class="line">  l.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f0 # 返回0</span><br><span class="line">f1 # 返回1</span><br></pre></td></tr></table></figure>
+<p>如果你能够理解 proc 在行为上更像 block，lambda 其实就是方法只不过是匿名的，那么你对上面的结果不会感到惊讶。</p>
+<p>如果把 f0,f1 做一些修改，就更容易理解上面的结果了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">def f0()</span><br><span class="line">  return 0</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f1()</span><br><span class="line">  def __f1</span><br><span class="line">    return 0</span><br><span class="line">  end</span><br><span class="line">  __f1</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f0 # 返回0</span><br><span class="line">f1 # 返回1</span><br></pre></td></tr></table></figure>
+<p><strong>return 只能在方法体里执行</strong>，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">p &#x3D; Proc.new &#123; return 0 &#125;</span><br><span class="line">l &#x3D; lambda &#123; return 0 &#125;</span><br><span class="line"></span><br><span class="line">p.call # 报LocalJumpError</span><br><span class="line">l.call # 返回0</span><br></pre></td></tr></table></figure>
+<p>构造 p 的时候没有使用 proc {return 0}，因为在 <strong>ruby1.8</strong> 中, proc {return 0}的行为和 lambda 一样，比如在 <strong>ruby1.8</strong> 中，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">def f(p)</span><br><span class="line">  p.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">p &#x3D; proc &#123; return 0 &#125;</span><br><span class="line">l &#x3D; lambda &#123; return 0 &#125;</span><br><span class="line"></span><br><span class="line">f(p)  # 返回1</span><br><span class="line">f(l)  # 返回1</span><br><span class="line"></span><br><span class="line">p.call # 返回0</span><br><span class="line">l.call # 返回0</span><br><span class="line"></span><br><span class="line">def f(p)</span><br><span class="line">  p.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">p &#x3D; Proc.new &#123; return 0 &#125;</span><br><span class="line">l &#x3D; lambda.new &#123; return 0&#125;</span><br><span class="line"></span><br><span class="line">f(p)  # 报LocalJumpError</span><br><span class="line">f(l)  # 返回1</span><br></pre></td></tr></table></figure>
+<p>感觉 proc 中的 return 能记住 proc 生成时其 block 的位置，然后无论 proc 在哪里调用，都会从 proc 生成时其 block 所在位置处开始 return，有下面的代码为证:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">def f(p)</span><br><span class="line">  p.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f2()</span><br><span class="line">  Proc.new &#123; return 0 &#125;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f3()</span><br><span class="line">  lambda &#123; return 0 &#125;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">p &#x3D; f2()</span><br><span class="line">l &#x3D; f3()</span><br><span class="line"></span><br><span class="line">f(p)  # 报LocalJumpError: unexpected return，from (irb):29:in &#96;f2&#39;</span><br><span class="line">f(l)  # 返回1</span><br></pre></td></tr></table></figure>
+<p>在 1.8, ree, jruby, 1.9, 2.0 各版本都测试过，结果一样。</p>
+<p>再看看下面的代码,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">def f0(&amp;p)</span><br><span class="line">  p.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f1()</span><br><span class="line">  yield</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f0 &#123; return 0&#125;  # LocalJumpErrorw</span><br><span class="line">f1 &#123; return 0&#125;  # LocalJumpErrorw</span><br><span class="line"></span><br><span class="line">f0(&amp;Proc.new&#123;return 0&#125;) # LocalJumpError</span><br><span class="line">f0(&amp;lambda&#123;return 0&#125;)   # 返回1</span><br><span class="line"></span><br><span class="line">def f2(&amp;p)</span><br><span class="line">  p</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">def f3()</span><br><span class="line">  p &#x3D; f2 do</span><br><span class="line">    return 0</span><br><span class="line">  end</span><br><span class="line">  p.call</span><br><span class="line">  1</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f3 # 返回0</span><br></pre></td></tr></table></figure>
+<p>们重点看看 f3 中的 proc p，它虽然是从 f2 中生成返回的，但是 p 生成时其 block 是处在在 f3 的方法体内，这个类似于，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def f3()</span><br><span class="line">  p &#x3D; Proc.new &#123; return 0&#125;</span><br><span class="line">  p.call</span><br><span class="line">  1</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>所以执行 f3 时，没有异常抛出，返回 0。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>当你想写出类似于 f do …; end 或者 f {…}的代码时，请直接使用 block,通过 yield, &amp;p 就能达到目的，当你想使用 proc 时，其实此时绝大部分的情况是你实际想用 lambda,请直接使用 lambda{}或者-&gt;{}就可以了， 尽量不要显示地使用 Proc.new{} 或者 proc{}去创建 proc。</p>
+<p>废话说了一大堆，其实最想说的是: <strong>用 block，用 lambda，不要用 proc，让 proc 做好自己的幕后工作就好了</strong>。</p>
+
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2022/01/21/GRPC/">prev</a>
+    
+
+    
+    <p>last update time 2022-05-06</p>
+    
+    
+        <a class="extend next post-next" href="/2021/02/26/golang-%E9%93%BE%E6%8E%A5redis/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

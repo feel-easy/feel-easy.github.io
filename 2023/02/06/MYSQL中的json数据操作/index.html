@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>MYSQL中的json数据操作  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">MYSQL中的json数据操作</h1>
+<article class="post markdown-style">
+  <blockquote>
+<p>mysql5.7以上提供了一种新的字段格式-json，大概是mysql想把非关系型和关系型数据库一口通吃，所以推出了这种非常好用的格式，这样，我们的很多基于mongoDb或者clickHouse的业务都可以用mysql去实现了。当然了，5.7的版本只是最基础的版本，对于海量数据的效率是远远不够的，不过这些都在mysql8.0解决了。今天我们就针对mysql的json数据格式操作做一个简单的介绍。</p>
+</blockquote>
+<h2 id="1-2-基础查询操作"><a href="#1-2-基础查询操作" class="headerlink" title="1.2 基础查询操作"></a>1.2 基础查询操作</h2><p>用法提示：</p>
+<ul>
+<li>如果<code>json</code>字符串不是数组，则直接使用<code>$.字段名</code></li>
+<li>如果<code>json</code>字符串是数组<code>[Array]</code>，则直接使用<code>$[对应元素的索引id]</code></li>
+</ul>
+<h3 id="1-2-1-一般json查询"><a href="#1-2-1-一般json查询" class="headerlink" title="1.2.1 一般json查询"></a>1.2.1 一般json查询</h3><p>使用 <code>json字段名-&gt;’$.json属性’</code> 进行查询条件,注意：如果 ‘-&gt;’ 不能用也可用 ‘-&gt;&gt;’ 查询<br>举个例子：如果想查询deptLeader=张五的数据，那么sql语句如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * from dept WHERE json_value-&gt;&#39;$.deptLeaderId&#39;&#x3D;&#39;5&#39;;</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-2-多个条件查询"><a href="#1-2-2-多个条件查询" class="headerlink" title="1.2.2 多个条件查询"></a>1.2.2 多个条件查询</h3><p>比如想查dept为“部门3”和deptLeaderId=5的数据，sql如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * from dept WHERE json_value-&gt;&#39;$.deptLeaderId&#39;&#x3D;&#39;5&#39; and json_value-&gt;&#39;$.deptId&#39;&#x3D;&#39;5&#39;;</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-3-json中多个字段关系查询"><a href="#1-2-3-json中多个字段关系查询" class="headerlink" title="1.2.3 json中多个字段关系查询"></a>1.2.3 json中多个字段关系查询</h3><p>比如想查询json格式中deptLeader=张五和deptId=5的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * from dept WHERE json_value-&gt;&#39;$.deptLeaderId&#39;&#x3D;&#39;5&#39; and json_value-&gt;&#39;$.deptId&#39;&#x3D;&#39;5&#39;;</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-4-关联表查询"><a href="#1-2-4-关联表查询" class="headerlink" title="1.2.4 关联表查询"></a>1.2.4 关联表查询</h3><p>这里我们要连表查询在dept 表中部门leader在dept_leader 中的详情</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SELECT * from dept,dept_leader </span><br><span class="line">WHERE dept.json_value-&gt;&#39;$.deptLeaderId&#39;&#x3D;dept_leader.json_value-&gt;&#39;$.id&#39; ;</span><br></pre></td></tr></table></figure>
+<h2 id="1-3-JSON函数操作"><a href="#1-3-JSON函数操作" class="headerlink" title="1.3 JSON函数操作"></a>1.3 JSON函数操作</h2><p>写到这里大家都发现了，我们查询的json都是整条json数据，这样看起来不是很方便，那么如果我们只想看json中的某个字段怎么办？</p>
+<h3 id="1-3-1-官方json函数"><a href="#1-3-1-官方json函数" class="headerlink" title="1.3.1 官方json函数"></a>1.3.1 官方json函数</h3><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-&gt;</td>
+<td>Return value from JSON column after evaluating path; equivalent to JSON_EXTRACT()</td>
+<td>计算路径后返回JSON列的值;相当于JSON_EXTRACT ()</td>
+</tr>
+<tr>
+<td>-&gt;&gt;</td>
+<td>Return value from JSON column after evaluating path and unquoting the result; equivalent to JSON_UNQUOTE(JSON_EXTRACT()).</td>
+<td>从JSON列返回值后，就算路径和取消引号的结果;相当于JSON_UNQUOTE (JSON_EXTRACT ())</td>
+</tr>
+<tr>
+<td>JSON_ARRAY()</td>
+<td>Create JSON array</td>
+<td>创建JSON数组</td>
+</tr>
+<tr>
+<td>JSON_ARRAY_APPEND()</td>
+<td>Append data to JSON document</td>
+<td>向JSON文档追加数据</td>
+</tr>
+<tr>
+<td>JSON_ARRAY_INSERT()</td>
+<td>Insert into JSON array</td>
+<td>插入JSON数组</td>
+</tr>
+<tr>
+<td>JSON_CONTAINS()</td>
+<td>Whether JSON document contains specific object at path</td>
+<td>JSON文档是否包含路径上的特定对象</td>
+</tr>
+<tr>
+<td>JSON_CONTAINS_PATH()</td>
+<td>Whether JSON document contains any data at path</td>
+<td>JSON文档是否在路径上包含任何数据</td>
+</tr>
+<tr>
+<td>JSON_DEPTH()</td>
+<td>Maximum depth of JSON document</td>
+<td>JSON文档的最大深度</td>
+</tr>
+<tr>
+<td>JSON_EXTRACT()</td>
+<td>Return data from JSON document</td>
+<td>从JSON文档返回数据</td>
+</tr>
+<tr>
+<td>JSON_INSERT()</td>
+<td>Insert data into JSON document</td>
+<td>将数据插入JSON文档</td>
+</tr>
+<tr>
+<td>JSON_KEYS()</td>
+<td>Array of keys from JSON document</td>
+<td>来自JSON文档的键数组</td>
+</tr>
+<tr>
+<td>JSON_LENGTH()</td>
+<td>Number of elements in JSON document</td>
+<td>JSON文档中的元素数量</td>
+</tr>
+<tr>
+<td>JSON_MERGE_PATCH()</td>
+<td>Merge JSON documents, replacing values of duplicate keys</td>
+<td>合并JSON文档，替换重复键的值</td>
+</tr>
+<tr>
+<td>JSON_MERGE_PRESERVE()</td>
+<td>Merge JSON documents, preserving duplicate keys</td>
+<td>合并JSON文档，保留重复的密钥</td>
+</tr>
+<tr>
+<td>JSON_OBJECT()</td>
+<td>Create JSON object</td>
+<td>创建JSON对象</td>
+</tr>
+<tr>
+<td>JSON_OVERLAPS()</td>
+<td>Compares two JSON documents, returns TRUE (1) if these have any key-value pairs or array elements in common, otherwise FALSE (0)</td>
+<td>比较两个JSON文档，如果它们有共同的键值对或数组元素，则返回TRUE(1)，否则返回FALSE (0)</td>
+</tr>
+<tr>
+<td>JSON_PRETTY()</td>
+<td>Print a JSON document in human-readable format</td>
+<td>以人类可读的格式打印JSON文档</td>
+</tr>
+<tr>
+<td>JSON_QUOTE()</td>
+<td>Quote JSON document</td>
+<td>引用JSON文档</td>
+</tr>
+<tr>
+<td>JSON_REMOVE()</td>
+<td>Remove data from JSON document</td>
+<td>从JSON文档中删除数据</td>
+</tr>
+<tr>
+<td>JSON_REPLACE()</td>
+<td>Replace values in JSON document</td>
+<td>替换JSON文档中的值</td>
+</tr>
+<tr>
+<td>JSON_SCHEMA_VALID()</td>
+<td>Validate JSON document against JSON schema; returns TRUE/1 if document validates against schema, or FALSE/0 if it does not</td>
+<td>针对JSON模式验证JSON文档;如果文档针对模式进行验证，则返回TRUE/1，否则返回FALSE/0</td>
+</tr>
+<tr>
+<td>JSON_SCHEMA_VALIDATION_REPORT()</td>
+<td>Validate JSON document against JSON schema; returns report in JSON format on outcome on validation including success or failure and reasons for failure</td>
+<td>针对JSON模式验证JSON文档;以JSON格式返回关于验证结果的报告，包括成功或失败以及失败原因</td>
+</tr>
+<tr>
+<td>JSON_SEARCH()</td>
+<td>Path to value within JSON document</td>
+<td>JSON文档中值的路径</td>
+</tr>
+<tr>
+<td>JSON_SET()</td>
+<td>Insert data into JSON document</td>
+<td>将数据插入JSON文档</td>
+</tr>
+<tr>
+<td>JSON_STORAGE_FREE()</td>
+<td>Freed space within binary representation of JSON column value following partial update</td>
+<td>在部分更新后释放JSON列值的二进制表示形式中的空间</td>
+</tr>
+<tr>
+<td>JSON_STORAGE_SIZE()</td>
+<td>pace used for storage of binary representation of a JSON document</td>
+<td>用于存储JSON文档的二进制表示的空间</td>
+</tr>
+<tr>
+<td>JSON_TABLE()</td>
+<td>Return data from a JSON expression as a relational table</td>
+<td>以关系表的形式从JSON表达式返回数据</td>
+</tr>
+<tr>
+<td>JSON_TYPE()</td>
+<td>Type of JSON value</td>
+<td>JSON值类型</td>
+</tr>
+<tr>
+<td>JSON_UNQUOTE()</td>
+<td>Unquote JSON value</td>
+<td>不引用JSON值</td>
+</tr>
+<tr>
+<td>JSON_VALID()</td>
+<td>Whether JSON value is valid</td>
+<td>JSON值是否有效</td>
+</tr>
+<tr>
+<td>JSON_VALUE()</td>
+<td>Extract value from JSON document at location pointed to by path provided; return this value as VARCHAR(512) or specified type</td>
+<td>根据所提供的路径从JSON文档中所指向的位置提取值;返回该值为VARCHAR(512)或指定的类型</td>
+</tr>
+<tr>
+<td>MEMBER OF()</td>
+<td>Returns true (1) if first operand matches any element of JSON array passed as second operand, otherwise returns false (0)</td>
+<td>如果第一个操作数匹配作为第二个操作数的JSON数组中的任何元素，则返回true(1)，否则返回false (0)</td>
+</tr>
+</tbody></table>
+<h3 id="1-3-2-gt-、-gt-gt-区别"><a href="#1-3-2-gt-、-gt-gt-区别" class="headerlink" title="1.3.2 -&gt;、-&gt;&gt;区别"></a>1.3.2 -&gt;、-&gt;&gt;区别</h3><p><code>-&gt;</code>在<code>field</code>中使用的时候结果带引号，<code>-&gt;&gt;</code>的结果不带引号</p>
+<h4 id="1-3-2-2-在where条件中使用"><a href="#1-3-2-2-在where条件中使用" class="headerlink" title="1.3.2.2 在where条件中使用"></a>1.3.2.2 在where条件中使用</h4><p>特别注意：<code>-&gt;</code>当做<code>where</code>查询是要注意类型的，<code>-&gt;&gt;</code>是不用注意类型的</p>
+<h3 id="1-3-3-json-extract-从json中返回想要的字段"><a href="#1-3-3-json-extract-从json中返回想要的字段" class="headerlink" title="1.3.3 json_extract():从json中返回想要的字段"></a>1.3.3 json_extract():从json中返回想要的字段</h3><p>用法：<code>json_extract(字段名,$.json字段名)</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id,json_extract(json_value,&#39;$.deptName&#39;) as deptName from dept;</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-4-JSON-CONTAINS-JSON格式数据是否在字段中包含特定对象"><a href="#1-3-4-JSON-CONTAINS-JSON格式数据是否在字段中包含特定对象" class="headerlink" title="1.3.4 JSON_CONTAINS():JSON格式数据是否在字段中包含特定对象"></a>1.3.4 JSON_CONTAINS():JSON格式数据是否在字段中包含特定对象</h3><p>用法: <code>JSON_CONTAINS(target, candidate[, path])</code><br>事例:如果我们想查询包含<code>deptName=部门5</code>的对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from dept WHERE JSON_CONTAINS(json_value, JSON_OBJECT(&quot;deptName&quot;,&quot;部门5&quot;))</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-5-JSON-OBJECT-将一个键值对列表转换成json对象"><a href="#1-3-5-JSON-OBJECT-将一个键值对列表转换成json对象" class="headerlink" title="1.3.5 JSON_OBJECT():将一个键值对列表转换成json对象"></a>1.3.5 JSON_OBJECT():将一个键值对列表转换成json对象</h3><p>比如我们想查询某个对象里面的值等于多少<br>比如我们添加这么一组数据到dept表中：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> dept <span class="keyword">VALUES</span>(<span class="number">6</span>,<span class="string">&#x27;部门9&#x27;</span>,<span class="string">&#x27;&#123;&quot;deptName&quot;: &#123;&quot;dept&quot;:&quot;de&quot;,&quot;depp&quot;:&quot;dd&quot;&#125;, &quot;deptId&quot;: &quot;5&quot;, &quot;deptLeaderId&quot;: &quot;5&quot;&#125;&#x27;</span>);</span><br></pre></td></tr></table></figure>
+<p>我们可以看到<code>deptName</code>中还有一个对象，里面还有dept和depp两个属性字段，那么我们应该怎么查询depp=dd的员工呢。</p>
+<p>用法：<code>JSON_OBJECT([key, val[, key, val] …])</code><br>事例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT * from (</span><br><span class="line">    SELECT *,json_value-&gt;&#39;$.deptName&#39; as deptName FROM dept</span><br><span class="line">) t WHERE JSON_CONTAINS(deptName,JSON_OBJECT(&quot;depp&quot;,&quot;dd&quot;));</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-6-JSON-ARRAY-创建JSON数组"><a href="#1-3-6-JSON-ARRAY-创建JSON数组" class="headerlink" title="1.3.6 JSON_ARRAY():创建JSON数组"></a>1.3.6 JSON_ARRAY():创建JSON数组</h3><p>比如我们添加这么一组数据到dept表中：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> dept <span class="keyword">VALUES</span>(<span class="number">7</span>,<span class="string">&#x27;部门9&#x27;</span>,<span class="string">&#x27;&#123;&quot;deptName&quot;: [&quot;1&quot;,&quot;2&quot;,&quot;3&quot;], &quot;deptId&quot;: &quot;5&quot;, &quot;deptLeaderId&quot;: &quot;5&quot;&#125;&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> dept <span class="keyword">VALUES</span>(<span class="number">7</span>,<span class="string">&#x27;部门9&#x27;</span>,<span class="string">&#x27;&#123;&quot;deptName&quot;: [&quot;5&quot;,&quot;6&quot;,&quot;7&quot;], &quot;deptId&quot;: &quot;5&quot;, &quot;deptLeaderId&quot;: &quot;5&quot;&#125;&#x27;</span>);</span><br></pre></td></tr></table></figure>
+<p>用法：<code>JSON_ARRAY([val[, val] …])</code></p>
+<p>事例：我们要查询deptName包含1的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * from dept WHERE JSON_CONTAINS(json_value-&gt;&#39;$.deptName&#39;,JSON_ARRAY(&quot;1&quot;))</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-7-JSON-TYPE-查询某个json字段属性类型"><a href="#1-3-7-JSON-TYPE-查询某个json字段属性类型" class="headerlink" title="1.3.7 JSON_TYPE():查询某个json字段属性类型"></a>1.3.7 JSON_TYPE():查询某个json字段属性类型</h3><p>用法：<code>JSON_TYPE(json_val)</code><br>事例：比如我们想查询deptName的字段属性是什么</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT json_value-&gt;&#39;$.deptName&#39; ,JSON_TYPE(json_value-&gt;&#39;$.deptName&#39;) as type from dept </span><br></pre></td></tr></table></figure>
+<h3 id="1-3-8-JSON-KEYS-JSON文档中的键数组"><a href="#1-3-8-JSON-KEYS-JSON文档中的键数组" class="headerlink" title="1.3.8 JSON_KEYS():JSON文档中的键数组"></a>1.3.8 JSON_KEYS():JSON文档中的键数组</h3><p>用法：<code>JSON_KEYS(json_value)</code><br>事例：比如我们想查询json格式数据中的所有key</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT JSON_KEYS(json_value) FROM dept </span><br></pre></td></tr></table></figure>
+
+
+<p>接下来的3种函数都是新增数据类型的：<br>JSON_SET(json_doc, path, val[, path, val] …)<br>JSON_INSERT(json_doc, path, val[, path, val] …)<br>JSON_REPLACE(json_doc, path, val[, path, val] …)</p>
+<h3 id="1-3-9-JSON-SET-将数据插入JSON格式中，有key则替换，无key则新增"><a href="#1-3-9-JSON-SET-将数据插入JSON格式中，有key则替换，无key则新增" class="headerlink" title="1.3.9 JSON_SET():将数据插入JSON格式中，有key则替换，无key则新增"></a>1.3.9 JSON_SET():将数据插入JSON格式中，有key则替换，无key则新增</h3><p>这也是我们开发过程中经常会用到的一个函数<br>用法：<code>JSON_SET(json_doc, path, val[, path, val] …)</code><br>事例：比如我们想针对id=2的数据新增一组：newData:新增的数据,修改deptName为新增的部门1<br>sql语句如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update dept set json_value&#x3D;JSON_SET(&#39;&#123;&quot;deptName&quot;: &quot;部门2&quot;, &quot;deptId&quot;: &quot;2&quot;, &quot;deptLeaderId&quot;: &quot;4&quot;&#125;&#39;,&#39;$.deptName&#39;,&#39;新增的部门1&#39;,&#39;$.newData&#39;,&#39;新增的数据&#39;) WHERE id&#x3D;2;</span><br></pre></td></tr></table></figure>
+<p><code>注意</code>：<code>json_doc</code>如果不带这个单元格之前的值，之前的值是会新值被覆盖的，比如我们如果更新的语句换成:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update dept set json_value&#x3D;JSON_SET(&#39;&#123;&quot;a&quot;:&quot;1&quot;,&quot;b&quot;:&quot;2&quot;&#125;&#39;,&#39;$.deptName&#39;,&#39;新增的部门1&#39;,&#39;$.newData&#39;,&#39;新增的数据&#39;) WHERE id&#x3D;2我们可以看到这里json_doc是&#123;“a”:“1”,“b”:“2”&#125;，这样的话会把之前的单元格值覆盖后再新增&#x2F;覆盖这个单元格字段</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-10-JSON-INSERT-插入值（往json中插入新值，但不替换已经存在的旧值）"><a href="#1-3-10-JSON-INSERT-插入值（往json中插入新值，但不替换已经存在的旧值）" class="headerlink" title="1.3.10 JSON_INSERT():插入值（往json中插入新值，但不替换已经存在的旧值）"></a>1.3.10 JSON_INSERT():插入值（往json中插入新值，但不替换已经存在的旧值）</h3><p>用法：<code>JSON_INSERT(json_doc, path, val[, path, val] …)</code><br>事例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UPDATE dept set json_value&#x3D;JSON_INSERT(&#39;&#123;&quot;a&quot;: &quot;1&quot;, &quot;b&quot;: &quot;2&quot;&#125;&#39;, &#39;$.deptName&#39;, &#39;新增的部门2&#39;,&#39;$.newData2&#39;,&#39;新增的数据2&#39;) </span><br><span class="line">WHERE id&#x3D;2</span><br></pre></td></tr></table></figure>
+<p>我们可以看到由于<code>json_doc</code>变化将之前的值覆盖了，新增了<code>deptName</code>和<code>newData2</code>.<br>如果我们再执行以下刚才的那个sql，只是换了value，我们会看到里面的key值不会发生变化。<br>因为这个函数只负责往json中插入新值，但不替换已经存在的旧值。</p>
+<h3 id="1-3-11-JSON-REPLACE"><a href="#1-3-11-JSON-REPLACE" class="headerlink" title="1.3.11 JSON_REPLACE()"></a>1.3.11 JSON_REPLACE()</h3><p>用法：<code>JSON_REPLACE(json_doc, path, val[, path, val] …)</code><br>用例：<br>如果我们要更新id=2数据中newData2的值为：更新的数据2<br>sql语句如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UPDATE dept set json_value&#x3D;JSON_REPLACE(&#39;&#123;&quot;a&quot;: &quot;1&quot;, &quot;b&quot;: &quot;2&quot;, &quot;deptName&quot;: &quot;新增的部门2&quot;, &quot;newData2&quot;: &quot;新增的数据2&quot;&#125;&#39;, &#39;$.newData2&#39;, &#39;更新的数据2&#39;) WHERE id &#x3D;2;</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-12-JSON-REMOVE-从JSON文档中删除数据"><a href="#1-3-12-JSON-REMOVE-从JSON文档中删除数据" class="headerlink" title="1.3.12 JSON_REMOVE():从JSON文档中删除数据"></a>1.3.12 JSON_REMOVE():从JSON文档中删除数据</h3><p>用法：<code>JSON_REMOVE(json_doc, path[, path] …)</code><br>举例：删除key为a的字段。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UPDATE dept set json_value&#x3D;JSON_REMOVE(&#39;&#123;&quot;a&quot;: &quot;1&quot;, &quot;b&quot;: &quot;2&quot;, &quot;deptName&quot;: &quot;新增的部门2&quot;, &quot;newData2&quot;: &quot;更新的数据2&quot;&#125;&#39;,&#39;$.a&#39;) WHERE id &#x3D;2;</span><br></pre></td></tr></table></figure>
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2023/03/03/MySQL%20%C2%B7%20%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%20%C2%B7%20%E5%A6%82%E4%BD%95%E7%B4%A2%E5%BC%95JSON%E5%AD%97%E6%AE%B5/">prev</a>
+    
+
+    
+    <p>last update time 2023-06-06</p>
+    
+    
+        <a class="extend next post-next" href="/2023/01/12/Docker%20Compose%20%E7%BD%91%E7%BB%9C%E8%AE%BE%E7%BD%AE/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>

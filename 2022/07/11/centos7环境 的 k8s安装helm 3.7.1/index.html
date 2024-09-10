@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>centos7环境 的 k8s安装helm 3.7.1  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">centos7环境 的 k8s安装helm 3.7.1</h1>
+<article class="post markdown-style">
+  <h1 id=""><a href="#" class="headerlink" title=""></a></h1><p><strong>一、 为什么要有helm?</strong></p>
+<p>K8S 上的应用对象，都是由特定的资源描述组成，包括 deployment、service 等。都保存 各自文件中或者集中写到一个配置文件。然后 kubectl apply –f 部署。如果应用只由一 个或几个这样的服务组成，上面部署方式足够了。而对于一个复杂的应用，会有很多类似 上面的资源描述文件，例如微服务架构应用，组成应用的服务可能多达十个，几十个。如 果有更新或回滚应用的需求，可能要修改和维护所涉及的大量资源文件，而这种组织和管 理应用的方式就显得力不从心了。且由于缺少对发布过的应用版本管理和控制，使 Kubernetes 上的应用维护和更新等面临诸多的挑战，主要面临以下问题：（1）如何将这 些服务作为一个整体管理 （2）这些资源文件如何高效复用 （3）不支持应用级别的版本 管理</p>
+<p><strong>二、 helm 解决的问题</strong></p>
+<p>Helm 是一个 Kubernetes 的包管理工具，就像 Linux 下的包管理器，如 yum/apt 等，可以 很方便的将之前打包好的 yaml 文件部署到 kubernetes 上。<br>Helm 有 3 个重要概念：<br>（1）helm：一个命令行客户端工具，主要用于 Kubernetes 应用 chart 的创建、打包、发 布和管理。<br>（2）Chart：应用描述，一系列用于描述 k8s 资源相关文件的集合。<br>（3）Release：基于 Chart 的部署实体，一个 chart 被 Helm 运行后将会生成对应的一个 release；将在 k8s 中创建出真实运行的资源对象。</p>
+<p><strong>三、安装helm</strong></p>
+<p>helm的官方网址：<a target="_blank" rel="noopener" href="https://helm.sh/">https://helm.sh/</a></p>
+<p>heml需要在k8s的主节点上安装。</p>
+<p>我们下载安装包进行安装，helm发布的版本地址如下：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/helm/helm/releases">https://github.com/helm/helm/releases</a></p>
+<p>centos7环境，则选择  Linux amd64 这个版本，下载地址如下：</p>
+<p><a target="_blank" rel="noopener" href="https://get.helm.sh/helm-v3.7.1-linux-amd64.tar.gz">https://get.helm.sh/helm-v3.7.1-linux-amd64.tar.gz</a></p>
+<p><img src="https://img2020.cnblogs.com/blog/98796/202112/98796-20211205153906611-2131384890.png" alt="img"></p>
+<p>我们在K8s主节点上先创建个目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir myhelm</span><br></pre></td></tr></table></figure>
+<p>进入该目录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd myhelm</span><br></pre></td></tr></table></figure>
+<p>下载：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -SLO https:&#x2F;&#x2F;get.helm.sh&#x2F;helm-v3.7.1-linux-amd64.tar.gz</span><br></pre></td></tr></table></figure>
+<p>解压：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf  helm-v3.7.1-linux-amd64.tar.gz</span><br></pre></td></tr></table></figure>
+
+
+<p>将helm移至 /bin 目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv  linux-amd64&#x2F;helm  &#x2F;usr&#x2F;local&#x2F;bin&#x2F;helm</span><br></pre></td></tr></table></figure>
+<p>这样就可以了。我们查看下版本号：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">helm version</span><br></pre></td></tr></table></figure>
+<p><img src="https://img2020.cnblogs.com/blog/98796/202112/98796-20211205154349309-283858203.png" alt="img"></p>
+<p> 说明安装成功了。</p>
+<p>添加国内 阿里云的 镜像源：</p>
+<p><a href="javascript:void(0);"><img src="https://common.cnblogs.com/images/copycode.gif" alt="复制代码"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">helm repo remove stable</span><br><span class="line">helm repo add stable http:&#x2F;&#x2F;mirror.azure.cn&#x2F;kubernetes&#x2F;charts&#x2F;</span><br><span class="line">helm repo update </span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+<p><a href="javascript:void(0);"><img src="https://common.cnblogs.com/images/copycode.gif" alt="复制代码"></a></p>
+<p> 也可以添加azure的源：（可选）</p>
+<p><a href="javascript:void(0);"><img src="https://common.cnblogs.com/images/copycode.gif" alt="复制代码"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">helm repo remove stable</span><br><span class="line"></span><br><span class="line">helm repo add stable http:&#x2F;&#x2F;mirror.azure.cn&#x2F;kubernetes&#x2F;charts&#x2F;</span><br><span class="line"></span><br><span class="line">helm repo add incubator http:&#x2F;&#x2F;mirror.azure.cn&#x2F;kubernetes&#x2F;charts-incubator&#x2F;</span><br><span class="line"></span><br><span class="line">helm repo update </span><br></pre></td></tr></table></figure>
+<p><a href="javascript:void(0);"><img src="https://common.cnblogs.com/images/copycode.gif" alt="复制代码"></a></p>
+<p>搜索：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">helm search repo redis</span><br></pre></td></tr></table></figure>
+
+
+<p><strong>四、helm 常用命令</strong></p>
+<p>1、 create</p>
+<p>创建一个 chart 并指定名字</p>
+<p>2、 dependency</p>
+<p>管理 chart 依赖</p>
+<p>3、get</p>
+<p>下载一个 release。可用子命令：all、hooks、manifest、notes、values</p>
+<p>4、history</p>
+<p>获取 release 历史</p>
+<p>5、install</p>
+<p>安装一个 chart</p>
+<p>6、list</p>
+<p>列出 release</p>
+<p>7、package</p>
+<p>将 chart 目录打包到 chart 存档文件中</p>
+<p>8、pull</p>
+<p>从远程仓库中下载 chart 并解压到本地 # helm pull stable/mysql –untar</p>
+<p>9、repo</p>
+<p>添加，列出，移除，更新和索引 chart 仓库。可用子命令：add、index、list、remove、update</p>
+<p>10、rollback</p>
+<p>从之前版本回滚</p>
+<p>11、search</p>
+<p>根据关键字搜索 chart。可用子命令：hub、repo</p>
+<p>12、show</p>
+<p>查看 chart 详细信息。可用子命令：all、chart、readme、values</p>
+<p>13、status</p>
+<p>显示已命名版本的状态</p>
+<p>14、template</p>
+<p>本地呈现模板</p>
+<p>15、uninstall</p>
+<p>卸载一个 release</p>
+<p>16、upgrade</p>
+<p>更新一个 release</p>
+<p>16、version</p>
+<p>查看 helm 客户端版本</p>
+
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2022/07/22/Go%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E5%A4%A7%E5%85%A8/">prev</a>
+    
+
+    
+    <p>last update time 2023-06-06</p>
+    
+    
+        <a class="extend next post-next" href="/2022/06/11/docker%E5%AE%89%E8%A3%85ES-elasticsearch-7-4-2/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>
