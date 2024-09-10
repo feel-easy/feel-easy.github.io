@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>vim批量替换命令实践  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">vim批量替换命令实践</h1>
+<article class="post markdown-style">
+  <p>语法为 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:[addr]s&#x2F;源字符串&#x2F;目的字符串&#x2F;[option]</span><br></pre></td></tr></table></figure>
+<p>全局替换命令为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:%s&#x2F;源字符串&#x2F;目的字符串&#x2F;g</span><br></pre></td></tr></table></figure>
+<p><strong>[addr] 表示检索范围，省略时表示当前行。</strong></p>
+<p>“1,20” ：表示从第1行到20行；</p>
+<p>“%” ：表示整个文件，同“1,$”；</p>
+<p>“. ,$” ：从当前行到文件尾；</p>
+<p><strong>s : 表示替换操作</strong></p>
+<p><strong>[option] : 表示操作类型</strong></p>
+<p>g 表示全局替换; </p>
+<p>c 表示进行确认</p>
+<p>p 表示替代结果逐行显示（Ctrl + L恢复屏幕）;</p>
+<p>省略option时仅对每行第一个匹配串进行替换;</p>
+<p>如果在源字符串和目的字符串中出现特殊字符，需要用”\”转义 如 \t</p>
+<p><strong>下面是一些例子：</strong></p>
+<p><strong>==================================================</strong></p>
+<p>#将That or this 换成 This or that<br>:%s/(That) or (this)/\u\2 or \l\1/</p>
+<p>=======================================================<br>#将句尾的child换成children<br>:%s/child([ ,.;!:?])/children\1/g</p>
+<p>=======================================================<br>#将mgi/r/abox换成mgi/r/asquare<br>:g/mg([ira])box/s//mg//my\1square/g  &lt;=&gt; :g/mg[ira]box/s/box/square/g</p>
+<p>=======================================================<br>#将多个空格换成一个空格<br>:%s/ */ /g</p>
+<p>=======================================================<br>#使用空格替换句号或者冒号后面的一个或者多个空格<br>:%s/([:.]) */\1 /g</p>
+<p>=======================================================<br>#删除所有空行<br>:g/^$/d</p>
+<p>=======================================================<br>#删除所有的空白行和空行<br>:g/^[  ][  ]*$/d</p>
+<p>=======================================================<br>#在每行的开始插入两个空白<br>:%s/^/&gt; /</p>
+<p>=======================================================<br>#在接下来的6行末尾加入.<br>:.,5/$/./</p>
+<p>=======================================================<br>#颠倒文件的行序<br>:g/.*/m0O &lt;=&gt; :g/^/m0O</p>
+<p>=======================================================<br>#寻找不是数字的开始行,并将其移到文件尾部<br>:g!/^[0-9]/m$ &lt;=&gt; g/^[^0-9]/m$</p>
+<p>=======================================================<br>#将文件的第12到17行内容复制10词放到当前文件的尾部<br>:1,10g/^/12,17t$<br>~~~~重复次数的作用</p>
+<p>=======================================================<br>#将chapter开始行下面的第二行的内容写道begin文件中<br>:g/^chapter/.+2w&gt;&gt;begin</p>
+<p>=======================================================<br>:/^part2/,/^part3/g/^chapter/.+2w&gt;&gt;begin</p>
+<p>=======================================================<br>:/^part2/,/^part3/g/^chapter/.+2w&gt;&gt;begin|+t$</p>
+
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+        <a class="extend prev post-prev" href="/2023/10/10/jupyter-lab%E9%85%8D%E7%BD%AE%E5%88%97%E8%A1%A8%E6%B8%85%E5%8D%95/">prev</a>
+    
+
+    
+    <p>last update time 2024-09-10</p>
+    
+    
+        <a class="extend next post-next" href="/2023/07/10/%E5%BC%95%E7%94%A8%E4%B8%8A%E4%B8%80%E6%AC%A1%E5%91%BD%E4%BB%A4%E7%9A%84%E5%8F%82%E6%95%B0/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>
