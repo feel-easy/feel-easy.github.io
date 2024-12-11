@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <title>MySQL MVCC 多版本并发控制  我的主页</title>
+  
+    <!-- stylesheets list from config.yml -->
+    
+      <link rel="stylesheet" href="/css/iLiKE.css">
+    
+  
+  
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+          href="//cdn.bootcss.com/highlight.js/9.2.0/styles/github.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js">
+    </script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+  
+  
+<meta name="generator" content="Hexo 5.3.0"><link rel="alternate" href="/atom.xml" title="我的主页" type="application/atom+xml">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+    <div class="menu">
+      <div class="menu-left">
+        <a href="/">
+          <!-- <img src="/favicon.ico"></img> -->
+        </a>
+      </div>
+      <div class="menu-right">
+        
+          
+          
+          
+          
+          
+          <a href="/">首页</a>
+        
+          
+          
+          
+          
+          
+          <a href="/archives">归档</a>
+        
+      </div>
+    </div>
+</div>
+    </div>
+    <div class="container">
+        <h1 class="post-title">MySQL MVCC 多版本并发控制</h1>
+<article class="post markdown-style">
+  <h2 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h2><p>本文深入剖析 MySQL InnoDB 存储引擎中 MVCC（多版本并发控制）工作原理，涵盖快照读、当前读概念，MVCC 关键构成（隐藏字段、Undo Log、ReadView），及其在不同事务隔离级别下的数据可见性处理与幻读问题解决，且附实例展示读提交和可重复读隔离级别下的 MVCC 操作流程。</p>
+<h2 id="二、MVCC-概述"><a href="#二、MVCC-概述" class="headerlink" title="二、MVCC 概述"></a>二、MVCC 概述</h2><h3 id="（一）定义"><a href="#（一）定义" class="headerlink" title="（一）定义"></a>（一）定义</h3><p>MVCC（Multiversion Concurrency Control）借由管理数据行多版本达成数据库事务并发时的一致性读。当事务读取正被更新行时，可获取更新前版本，有效化解读写冲突，此技术确保 InnoDB 事务隔离级别下一致性读操作顺畅执行，各 DBMS 实现方式有别且无统一标准，本文聚焦 InnoDB 实现机制（MySQL 其他存储引擎不支持）。</p>
+<h3 id="（二）快照读与当前读"><a href="#（二）快照读与当前读" class="headerlink" title="（二）快照读与当前读"></a>（二）快照读与当前读</h3><h4 id="1-快照读"><a href="#1-快照读" class="headerlink" title="1. 快照读"></a>1. 快照读</h4><ul>
+<li><strong>概念</strong>：MVCC 于 MySQL InnoDB 核心应用为快照读，是不加锁非阻塞读，如 <code>SELECT * FROM player WHERE...</code>，基于提升并发性能考量，以多版本技术实现，可能读取历史版本数据，前提为隔离级别非串行，否则退化为当前读。</li>
+<li><strong>原理</strong>：MVCC 本质是乐观锁思维体现，于事务并发场景，读操作无需等待写事务释放锁，直接读取合适版本数据，减少锁竞争与等待开销，提升系统整体并发性能，其多版本数据存储与管理依赖隐藏字段、Undo Log 与 ReadView 协同。</li>
+</ul>
+<h4 id="2-当前读"><a href="#2-当前读" class="headerlink" title="2. 当前读"></a>2. 当前读</h4><ul>
+<li><strong>概念</strong>：与快照读相反，当前读为加锁操作，属悲观锁实现，读取记录最新版本且锁定，防并发事务修改，如加锁 <code>SELECT</code>、增删改操作皆引发当前读，像 <code>SELECT * FROM student LOCK IN SHARE MODE;</code>（共享锁）与 <code>SELECT * FROM student FOR UPDATE;</code>（排他锁）等。</li>
+<li><strong>原理</strong>：数据库执行当前读时，依操作类型精准施加合适锁（共享或排他），确保数据一致性与完整性，此过程需权衡锁粒度与并发性能，粗粒度锁虽易控制数据一致性但并发度受限，细粒度锁并发高但管理复杂、易引发死锁，数据库依业务场景抉择最优锁策略。</li>
+</ul>
+<h2 id="三、MVCC-三剑客"><a href="#三、MVCC-三剑客" class="headerlink" title="三、MVCC 三剑客"></a>三、MVCC 三剑客</h2><h3 id="（一）回顾隔离级别"><a href="#（一）回顾隔离级别" class="headerlink" title="（一）回顾隔离级别"></a>（一）回顾隔离级别</h3><p>事务隔离级别调控并发事务对资源访问隔离程度，越高则事务干扰越小、安全性越高，主要级别含读未提交、读提交、可重复读（MySQL 默认）、串行化，各有特性与读问题表现：</p>
+<ul>
+<li><strong>读未提交</strong>：事务可读未提交数据，无锁机制，性能顶尖却易现脏读（读未提交事务修改数据）。</li>
+<li><strong>读提交</strong>：事务仅见已提交事务数据，MVCC 底层支撑，每次快照读生读视图，解脏读之困，如多事务并发场景，一事务读取数据不受未提交事务干扰，保数据有效性。</li>
+<li><strong>可重复读</strong>：事务多次读数据恒定，MVCC 为基，首次快照读制读视图复用，除脏读、克不可重复读（多次读数据变）难题，InnoDB 引擎下可解幻读（读数据集合变），读事务不受其他事务数据变更影响，保障数据稳定性与可预测性。</li>
+<li><strong>串行化</strong>：事务加锁阻塞，读共享锁、写排他锁，性能居末，却根治脏读、不可重复读与幻读，以牺牲并发换高数据一致性，适用对数据准确性严苛场景。</li>
+</ul>
+<h3 id="（二）隐藏字段、Undo-Log-版本链"><a href="#（二）隐藏字段、Undo-Log-版本链" class="headerlink" title="（二）隐藏字段、Undo Log 版本链"></a>（二）隐藏字段、Undo Log 版本链</h3><h4 id="1-隐藏字段"><a href="#1-隐藏字段" class="headerlink" title="1. 隐藏字段"></a>1. 隐藏字段</h4><p>InnoDB 表聚簇索引记录含关键隐藏列：</p>
+<ul>
+<li><strong>trx_id（事务 id）</strong>：事务改动聚簇索引记录时，自身事务 id 赋于此列，标记数据修改者，助 MVCC 追踪数据版本所属事务，为数据可见性判断奠基。</li>
+<li><strong>roll_pointer（回滚指针）</strong>：指向 Undo Log 里记录版本链近节点，记录更新时旧版本入 Undo Log，此指针串起历史版本形成单向链表，回溯数据变更轨迹，供 MVCC 按需取历史版本。</li>
+</ul>
+<h4 id="2-Undo-Log（回滚日志）"><a href="#2-Undo-Log（回滚日志）" class="headerlink" title="2. Undo Log（回滚日志）"></a>2. Undo Log（回滚日志）</h4><p>事务写操作时，MySQL 先存旧版本数据于 Undo Log，再更新数据库，事务提交前用于回滚，提交后助提供历史版本读取数据，其版本链为链表结构，各版本依时间或事务推进有序排列，头部为最新版本，MVCC 依此定位检索历史版本，保数据完整性与一致性，助事务回滚与多版本并发控制。</p>
+<h3 id="（三）ReadView"><a href="#（三）ReadView" class="headerlink" title="（三）ReadView"></a>（三）ReadView</h3><h4 id="1-ReadView（读视图）简约版"><a href="#1-ReadView（读视图）简约版" class="headerlink" title="1. ReadView（读视图）简约版"></a>1. ReadView（读视图）简约版</h4><p>事务快照读时生成 ReadView，快照记录系统活跃事务 id（递增），主用于数据可见性判定。含关键全局属性：</p>
+<ul>
+<li><strong>creator_trx_id</strong>：创建读视图事务 ID，增删改事务有资格分配（读事务 id 为 0），标识读视图所属事务，助判断事务与数据版本关联及可见性。</li>
+<li><strong>trx_ids</strong>：生成 ReadView 时系统活跃读写事务 id 列表，反映系统并发事务活跃态势，MVCC 依此对比数据版本事务 id 判断可见性，界定事务能访问的数据版本范围。</li>
+<li><strong>up_limit_id</strong>：活跃事务列表最小事务 ID，界定事务生成 ReadView 前已提交事务下限，小于此 id 的数据版本对当前事务可见，因在当前事务启动前已稳定提交。</li>
+<li><strong>low_limit_id</strong>：系统应分配给下一事务的 id 值（非 trx_ids 最大值，事务 id 递增），示活跃事务 id 上限，大于等于此 id 的数据版本在当前事务后产生不可见，标志事务启动后新事务修改数据不可访问。</li>
+</ul>
+<h4 id="2-设计思路"><a href="#2-设计思路" class="headerlink" title="2. 设计思路"></a>2. 设计思路</h4><ul>
+<li><strong>不同隔离级别处理逻辑</strong><ul>
+<li><strong>READ UNCOMMITTED</strong>：事务可读未提交记录最新版，因无数据一致性严格要求，无需复杂版本控制，直取最新数据，适对数据时效敏感轻一致性场景，如实时监控数据采集，及时反映最新数据变化，不顾及数据短暂不一致性。</li>
+<li><strong>SERIALIZABLE</strong>：InnoDB 强用加锁访问记录，保数据强一致性，多事务串行执行无并发干扰，如金融核心交易处理，数据准确重于性能，确保各交易有序、准确处理，杜绝并发异常致数据错误风险。</li>
+<li><strong>READ COMMITTED 和 REPEATABLE READ</strong>：须保证读已提交事务修改数据，核心是精准判断版本链数据版本可见性，ReadView 在此关键，屏蔽未提交事务干扰，READ COMMITTED 每次读新生成 ReadView，REPEATABLE READ 首次读生成后复用，适配不同并发控制与数据一致性平衡需求。</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-ReadView-的规则"><a href="#3-ReadView-的规则" class="headerlink" title="3. ReadView 的规则"></a>3. ReadView 的规则</h4><p>依 ReadView 判断记录版本可见性规则如下：</p>
+<ul>
+<li>若被访问版本 <code>trx_id</code> 与 <code>creator_trx_id</code> 同，事务访问自身修改记录，版本可见。</li>
+<li>被访问版本 <code>trx_id</code> 小于 <code>up_limit_id</code>，此版本在 ReadView 生成前已提交，事务可访问。</li>
+<li>被访问版本 <code>trx_id</code> 大于等于 <code>low_limit_id</code>，版本于 ReadView 生成后产生，事务不可访问。</li>
+<li>被访问版本 <code>trx_id</code> 在 <code>up_limit_id</code> 与 <code>low_limit_id</code> 间，若在 <code>trx_ids</code> 列表，版本对应事务活跃，不可访问；若不在，版本事务已提交，事务可访问。</li>
+</ul>
+<h4 id="4-MVCC-整体操作流程"><a href="#4-MVCC-整体操作流程" class="headerlink" title="4. MVCC 整体操作流程"></a>4. MVCC 整体操作流程</h4><p>MVCC 查询记录流程为：</p>
+<ul>
+<li>先取事务自身版本号（事务 ID），为后续判断数据版本归属与可见性锚点。</li>
+<li>获取 ReadView，依事务隔离级别与执行阶段生成或复用，含系统活跃事务关键信息，定数据可见性判断依据。</li>
+<li>查询数据并与 ReadView 事务版本号比，不符规则从 Undo Log 取历史快照，Undo Log 依 roll_pointer 存历史版本链，MVCC 回溯检索，直至得符合规则数据返回；若版本链遍历完无可见数据，事务对该记录不可见，查询结果排除此记录。</li>
+</ul>
+<h2 id="四、举例说明-MVCC-流程"><a href="#四、举例说明-MVCC-流程" class="headerlink" title="四、举例说明 MVCC 流程"></a>四、举例说明 MVCC 流程</h2><h3 id="（一）读提交的-MVCC-流程"><a href="#（一）读提交的-MVCC-流程" class="headerlink" title="（一）读提交的 MVCC 流程"></a>（一）读提交的 MVCC 流程</h3><p>读提交事务每次读最新已提交数据，MVCC 底层每次读前生成 ReadView，借版本链与 ReadView 对比锁定目标数据版本。如 <code>student</code> 表 <code>id</code> 为 1 记录受多事务操作，事务执行中首次修改才获递增事务 id，某读提交隔离级别事务多次查询此记录，随其他事务提交与更新，各次查询依新生成 ReadView 与版本链比对筛选可见版本，如首次查因其他事务未提交，读旧版本；后因事务提交更新，ReadView 变致查询结果更新，此流程契合读提交隔离级别特性，保证事务读取最新已提交数据，适应多事务并发读写场景，平衡数据一致性与实时性需求，为事务处理提供灵活高效数据读取机制，支撑系统并发处理能力提升，广泛适用于对数据实时性要求高、能容忍适度数据不一致场景，如电商商品库存查询，实时展示最新更新库存，用户获取最新数据，促进交易决策准确性与效率提升。</p>
+<h3 id="（二）可重复读的-MVCC-流程"><a href="#（二）可重复读的-MVCC-流程" class="headerlink" title="（二）可重复读的 MVCC 流程"></a>（二）可重复读的 MVCC 流程</h3><p>可重复读隔离级别事务首次查询生成 ReadView 后复用，后续查询数据稳定。如 <code>student</code> 表 <code>id</code> 为 1 记录在多事务操作下，事务首次查询依初始 ReadView 与版本链筛选可见版本记录；后续即便其他事务提交修改，因 ReadView 复用，查询结果恒同，实现可重复读语义，确保事务多次读数据一致，稳固数据一致性与可预测性，在并发事务环境为事务处理筑牢数据基石，适用于对数据稳定性要求极高场景，如金融账户余额查询、订单数据读取，保证数据一致性，防止并发事务干扰致数据波动，维护业务逻辑严谨性与数据可靠性，保障系统核心业务稳定运行，提升用户信任度与系统可靠性声誉，是处理关键数据事务隔离的理想之选。</p>
+<h3 id="（三）InnoDB-解决幻读问题"><a href="#（三）InnoDB-解决幻读问题" class="headerlink" title="（三）InnoDB 解决幻读问题"></a>（三）InnoDB 解决幻读问题</h3><p>InnoDB 可重复读隔离级别有效解决幻读，如 <code>student</code> 表初始单数据，事务 A 首次查询依 ReadView 机制见该数据；事务 B 插入并提交新数据后，事务 A 二次查询，依复用 ReadView 详审各数据版本可见性，新插入数据虽满足查询条件，但依其事务 id 与事务 A 的 ReadView 比对，因在特定事务范围判定不可见，事务 A 仍只读取首次查询数据，无幻读现象，此机制基于 MVCC 与 ReadView 精妙协同，严格管控数据可见性，保障事务在复杂并发读写操作下数据感知稳定，规避幻读致业务逻辑混乱风险，为数据库事务处理可靠性与一致性提供坚实护盾，于各类数据密集型业务关键事务处理场景意义深远，如企业资源规划系统订单处理、库存管理，防止因幻读引发库存数量误判、订单数据错配等严重业务失误，稳固业务流程准确性与数据质量，提升系统运营效率与管理效能。</p>
+<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p>本文详述 MVCC 在 READ COMMITTED 与 REPEATABLE READ 隔离级别事务快照读访问版本链过程，核心为 ReadView 原理及生成时机差异。READ COMMITTED 每次 SELECT 前新建 ReadView，REPEATABLE READ 仅首次生成复用，二者于不同场景平衡并发性能与数据一致性。MVCC 优势显著：化解读写阻塞，借乐观锁理念使读写操作并行，削减事务等待时间，提升系统整体吞吐与响应速率；降低死锁概率，减少锁争用冲突致死锁隐患，优化系统稳定性与可靠性；精准解决快照读问题，事务依 ReadView 读特定时间点前提交数据版本，保障数据读取一致性与可预测性，契合复杂数据库应用多元需求，为构建高效、稳定、可靠数据库事务处理环境筑牢根基，广泛赋能各行业数据驱动业务系统稳健发展，是现代数据库技术保障数据质量与处理效能的核心机制之一。 </p>
+
+</article>
+
+    <div class="pagenator post-pagenator">
+    
+    
+
+    
+    <p>last update time 2024-12-11</p>
+    
+    
+        <a class="extend next post-next" href="/2023/10/10/jupyter-lab%E9%85%8D%E7%BD%AE%E5%88%97%E8%A1%A8%E6%B8%85%E5%8D%95/">next</a>
+    
+    </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="container">
+    <div class="social">
+	<ul class="social-list">
+		
+			
+				
+				
+				<li>
+					<a href="mailto:867869344@qq.com" title="email" target="_blank">
+					<i class="fa fa-email"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://github.com/feel-easy" title="github" target="_self">
+					<i class="fa fa-github"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+			
+				
+				<li>
+					<a href="https://www.jianshu.com/u/df8ad5309e07" title="jianshu" target="_self">
+					<i class="fa fa-jianshu"></i>
+					</a>
+				</li>
+			
+		
+			
+		
+			
+		
+			
+		
+	</ul>
+</div>
+    <div class="copyright">
+        <span>
+            
+            
+            
+                © len 2021 - 2024
+            
+        </span>
+        <span>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022032160号-1</a>
+        </span>
+    </div>
+    <div class="power">
+        <span>
+            Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/CaiChenghan/iLiKE">iLiKE Theme</a>
+        </span>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <!--page counter part-->
+
+</div>
+
+    </div>
+</body>
+</html>
